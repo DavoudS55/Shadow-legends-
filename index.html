@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Shadow Legends | Mobile Legends Customs</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <a href="#" class="brand">
+            <span class="brand-mark">SL</span>
+            <span class="brand-name">SHADOW <strong>LEGENDS</strong></span>
+        </a>
+
+        <nav>
+            <a href="#live">Live Customs</a>
+            <a href="#upcoming">Upcoming</a>
+        </nav>
+
+        <button class="nav-button" onclick="scrollToCustoms()">
+            Join a Custom
+        </button>
+    </header>
+
+
+    <!-- Hero -->
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    <span class="status-dot"></span>
+                    MOBILE LEGENDS CUSTOMS
+                </div>
+
+                <h1>
+                    PLAY.
+                    <span>COMPETE.</span>
+                    <br>
+                    MAKE LEGENDS.
+                </h1>
+
+                <p>
+                    Find your next Mobile Legends custom match,
+                    choose your role, and step into the battlefield.
+                </p>
+
+                <div class="hero-actions">
+                    <button class="primary-button" onclick="scrollToCustoms()">
+                        Explore Customs
+                        <span>→</span>
+                    </button>
+
+                    <a href="#upcoming" class="secondary-button">
+                        View Upcoming
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="hero-decoration">
+
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+
+                <div class="hero-card">
+                    <span>SHADOW</span>
+                    <strong>LEGENDS</strong>
+                    <small>MLBB CUSTOMS</small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Live Customs -->
+        <section class="custom-section" id="live">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">LIVE NOW</span>
+                    <h2>Customs in Progress</h2>
+                    <p>Jump into an active registration and claim your spot.</p>
+                </div>
+
+                <div class="live-indicator">
+                    <span></span>
+                    LIVE
+                </div>
+
+            </div>
+
+
+            <div class="custom-grid">
+
+                <!-- Custom Card -->
+                <article class="custom-card live-card">
+
+                    <div class="card-top">
+
+                        <div class="custom-status">
+                            <span class="live-dot"></span>
+                            REGISTRATION OPEN
+                        </div>
+
+                        <span class="custom-number">#001</span>
+
+                    </div>
+
+
+                    <div class="custom-title">
+                        <span>SHADOW LEGENDS</span>
+                        <h3>Nightfall Custom</h3>
+                    </div>
+
+
+                    <div class="match-info">
+
+                        <div class="info-item">
+                            <span>STARTS IN</span>
+                            <strong class="countdown" data-time="3600">
+                                01:00:00
+                            </strong>
+                        </div>
+
+                        <div class="info-item">
+                            <span>PLAYERS</span>
+                            <strong>7 / 10</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="capacity">
+
+                        <div class="capacity-header">
+                            <span>Player Capacity</span>
+                            <span>70%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div style="width: 70%"></div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-footer">
+
+                        <span class="open-status">
+                            3 spots available
+                        </span>
+
+                        <button
+                            class="join-button"
+                            onclick="openCustom('Nightfall Custom', '7', '10', 'Today • 21:00')"
+                        >
+                            View Custom
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Second Custom -->
+                <article class="custom-card live-card">
+
+                    <div class="card-top">
+
+                        <div class="custom-status">
+                            <span class="live-dot"></span>
+                            REGISTRATION OPEN
+                        </div>
+
+                        <span class="custom-number">#002</span>
+
+                    </div>
+
+
+                    <div class="custom-title">
+                        <span>SHADOW LEGENDS</span>
+                        <h3>Midnight Clash</h3>
+                    </div>
+
+
+                    <div class="match-info">
+
+                        <div class="info-item">
+                            <span>STARTS IN</span>
+                            <strong class="countdown" data-time="7200">
+                                02:00:00
+                            </strong>
+                        </div>
+
+                        <div class="info-item">
+                            <span>PLAYERS</span>
+                            <strong>4 / 10</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="capacity">
+
+                        <div class="capacity-header">
+                            <span>Player Capacity</span>
+                            <span>40%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div style="width: 40%"></div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-footer">
+
+                        <span class="open-status">
+                            6 spots available
+                        </span>
+
+                        <button
+                            class="join-button"
+                            onclick="openCustom('Midnight Clash', '4', '10', 'Today • 23:00')"
+                        >
+                            View Custom
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- Upcoming -->
+        <section class="custom-section upcoming-section" id="upcoming">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">COMING SOON</span>
+                    <h2>Upcoming Customs</h2>
+                    <p>Prepare yourself for the next battle.</p>
+                </div>
+
+            </div>
+
+
+            <div class="upcoming-list">
+
+                <article class="upcoming-card">
+
+                    <div class="date-box">
+                        <span>SEP</span>
+                        <strong>11</strong>
+                    </div>
+
+                    <div class="upcoming-main">
+                        <span>SHADOW LEGENDS</span>
+                        <h3>After Dark</h3>
+                        <p>Registration opens soon</p>
+                    </div>
+
+                    <div class="upcoming-time">
+                        <span>START TIME</span>
+                        <strong>21:00</strong>
+                    </div>
+
+                    <button
+                        class="details-button"
+                        onclick="openCustom('After Dark', '0', '10', 'September 11 • 21:00')"
+                    >
+                        Details
+                    </button>
+
+                </article>
+
+
+                <article class="upcoming-card">
+
+                    <div class="date-box">
+                        <span>SEP</span>
+                        <strong>12</strong>
+                    </div>
+
+                    <div class="upcoming-main">
+                        <span>SHADOW LEGENDS</span>
+                        <h3>Royal Rumble</h3>
+                        <p>Registration opens soon</p>
+                    </div>
+
+                    <div class="upcoming-time">
+                        <span>START TIME</span>
+                        <strong>22:00</strong>
+                    </div>
+
+                    <button
+                        class="details-button"
+                        onclick="openCustom('Royal Rumble', '0', '10', 'September 12 • 22:00')"
+                    >
+                        Details
+                    </button>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- About -->
+        <section class="about-section">
+
+            <div class="about-box">
+
+                <span class="section-label">THE BATTLEFIELD</span>
+
+                <h2>
+                    Your next game
+                    <span>starts here.</span>
+                </h2>
+
+                <p>
+                    Shadow Legends brings Mobile Legends players together
+                    for organized custom matches. Pick your role,
+                    secure your position, and prepare for battle.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Custom Modal -->
+    <div class="modal-overlay" id="customModal">
+
+        <div class="custom-modal">
+
+            <button class="close-modal" onclick="closeCustom()">
+                ×
+            </button>
+
+            <span class="section-label">CUSTOM MATCH</span>
+
+            <h2 id="modalTitle">
+                Nightfall Custom
+            </h2>
+
+            <div class="modal-details">
+
+                <div>
+                    <span>DATE & TIME</span>
+                    <strong id="modalTime">Today • 21:00</strong>
+                </div>
+
+                <div>
+                    <span>PLAYERS</span>
+                    <strong id="modalPlayers">7 / 10</strong>
+                </div>
+
+            </div>
+
+            <div class="modal-capacity">
+
+                <div class="modal-capacity-title">
+                    <span>Capacity</span>
+                    <span id="modalCapacity">3 spots left</span>
+                </div>
+
+                <div class="progress">
+                    <div id="modalProgress"></div>
+                </div>
+
+            </div>
+
+            <button class="modal-join" onclick="startRegistration()">
+                Join This Custom
+                <span>→</span>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <div class="footer-brand">
+            <span class="brand-mark">SL</span>
+
+            <div>
+                <strong>SHADOW LEGENDS</strong>
+                <small>Mobile Legends Customs</small>
+            </div>
+        </div>
+
+        <p>
+            © 2026 Shadow Legends. Built for the battlefield.
+        </p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+  </html>
