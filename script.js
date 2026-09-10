@@ -1,104 +1,167 @@
-/* ==========================================
+/* =========================================================
    SHADOW LEGENDS
-   ========================================== */
+   Frontend Tournament System
+========================================================= */
 
 
-/*
-    Temporary local database.
+/* =========================================================
+   STORAGE
+========================================================= */
 
-    In the next step this will be replaced
-    with Supabase.
-*/
-
-const CUSTOM_STORAGE_KEY = "shadow_legends_customs";
-const REGISTRATION_STORAGE_KEY = "shadow_legends_registrations";
+const CUSTOMS_KEY = "shadow_legends_customs_v2";
+const REGISTRATIONS_KEY = "shadow_legends_registrations_v2";
 
 
-/* ==========================================
-   DEFAULT CUSTOMS
-   ========================================== */
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-const defaultCustoms = [
+const liveContainer = document.getElementById("liveCustoms");
+const upcomingContainer = document.getElementById("upcomingCustoms");
 
-    {
-        id: "custom-001",
-        title: "Nightfall Custom",
-        players: 10,
-        startTime: "21:00",
-        registrationStart: "18:00",
-        type: "live",
-        registrations: []
-    },
+const liveCount = document.getElementById("liveCount");
+const upcomingCount = document.getElementById("upcomingCount");
 
-    {
-        id: "custom-002",
-        title: "Midnight Clash",
-        players: 10,
-        startTime: "23:00",
-        registrationStart: "20:00",
-        type: "live",
-        registrations: []
-    },
+const registerModal = document.getElementById("registerModal");
+const successModal = document.getElementById("successModal");
+const detailsModal = document.getElementById("detailsModal");
 
-    {
-        id: "custom-003",
-        title: "After Dark",
-        players: 10,
-        startTime: "21:00",
-        registrationStart: "18:00",
-        type: "upcoming",
-        date: "September 11",
-        registrations: []
-    },
+const registrationForm = document.getElementById("registrationForm");
 
-    {
-        id: "custom-004",
-        title: "Royal Rumble",
-        players: 10,
-        startTime: "22:00",
-        registrationStart: "19:00",
-        type: "upcoming",
-        date: "September 12",
-        registrations: []
-    }
+const customIdInput = document.getElementById("customId");
+const registerTitle = document.getElementById("registerTitle");
 
-];
+const telegramInput = document.getElementById("telegram");
+const gameIdInput = document.getElementById("gameId");
+const roleInput = document.getElementById("role");
+const rankInput = document.getElementById("rank");
+
+const starsGroup = document.getElementById("starsGroup");
+const starsInput = document.getElementById("stars");
+
+const formError = document.getElementById("formError");
+
+const successText = document.getElementById("successText");
+
+const detailsTitle = document.getElementById("detailsTitle");
+const detailsStatus = document.getElementById("detailsStatus");
+const detailsPlayers = document.getElementById("detailsPlayers");
+const detailsStart = document.getElementById("detailsStart");
+const detailsRegistration = document.getElementById("detailsRegistration");
 
 
-/* ==========================================
+/* =========================================================
+   DEMO CUSTOMS
+   These are only for testing.
+   Later they can come from Supabase.
+========================================================= */
+
+function createDemoCustoms() {
+
+    const now = new Date();
+
+    const liveStart = new Date(
+        now.getTime() + 90 * 60 * 1000
+    );
+
+    const liveRegistration = new Date(
+        now.getTime() - 30 * 60 * 1000
+    );
+
+    const upcomingStart = new Date(
+        now.getTime() + 5 * 60 * 60 * 1000
+    );
+
+    const upcomingRegistration = new Date(
+        now.getTime() + 90 * 60 * 1000
+    );
+
+    const tomorrow = new Date(
+        now.getTime() + 24 * 60 * 60 * 1000
+    );
+
+    const tomorrowRegistration = new Date(
+        now.getTime() + 20 * 60 * 60 * 1000
+    );
+
+
+    return [
+
+        {
+            id: "custom-001",
+            title: "Shadow Custom #001",
+            playerLimit: 10,
+
+            startTime: liveStart.toISOString(),
+            registrationStart: liveRegistration.toISOString(),
+
+            type: "live"
+        },
+
+        {
+            id: "custom-002",
+            title: "Shadow Custom #002",
+            playerLimit: 10,
+
+            startTime: upcomingStart.toISOString(),
+            registrationStart: upcomingRegistration.toISOString(),
+
+            type: "upcoming"
+        },
+
+        {
+            id: "custom-003",
+            title: "Shadow Custom #003",
+            playerLimit: 10,
+
+            startTime: tomorrow.toISOString(),
+            registrationStart: tomorrowRegistration.toISOString(),
+
+            type: "upcoming"
+        }
+
+    ];
+}
+
+
+/* =========================================================
    LOAD DATA
-   ========================================== */
+========================================================= */
 
 function loadCustoms() {
 
-    const saved =
-        localStorage.getItem(CUSTOM_STORAGE_KEY);
+    const saved = localStorage.getItem(CUSTOMS_KEY);
 
-    if (!saved) {
+    if (saved) {
 
-        localStorage.setItem(
-            CUSTOM_STORAGE_KEY,
-            JSON.stringify(defaultCustoms)
-        );
+        try {
 
-        return defaultCustoms;
+            return JSON.parse(saved);
+
+        } catch (error) {
+
+            console.error("Invalid custom data");
+
+        }
+
     }
 
-    try {
+    const demo = createDemoCustoms();
 
-        return JSON.parse(saved);
+    localStorage.setItem(
+        CUSTOMS_KEY,
+        JSON.stringify(demo)
+    );
 
-    } catch {
-
-        return defaultCustoms;
-    }
+    return demo;
 }
 
 
 function loadRegistrations() {
 
-    const saved =
-        localStorage.getItem(REGISTRATION_STORAGE_KEY);
+    const saved = localStorage.getItem(
+        REGISTRATIONS_KEY
+    );
 
     if (!saved) {
         return [];
@@ -108,239 +171,394 @@ function loadRegistrations() {
 
         return JSON.parse(saved);
 
-    } catch {
+    } catch (error) {
 
         return [];
+
     }
 }
 
 
-let customs = loadCustoms();
-let registrations = loadRegistrations();
-
-
-/* ==========================================
-   SAVE
-   ========================================== */
-
-function saveData() {
+function saveRegistrations(data) {
 
     localStorage.setItem(
-        CUSTOM_STORAGE_KEY,
-        JSON.stringify(customs)
-    );
-
-    localStorage.setItem(
-        REGISTRATION_STORAGE_KEY,
-        JSON.stringify(registrations)
+        REGISTRATIONS_KEY,
+        JSON.stringify(data)
     );
 }
 
 
-/* ==========================================
-   RENDER CUSTOMS
-   ========================================== */
+/* =========================================================
+   GLOBAL DATA
+========================================================= */
 
-function renderCustoms() {
+let customs = loadCustoms();
 
-    const liveContainer =
-        document.getElementById("liveCustoms");
+let registrations = loadRegistrations();
 
-    const upcomingContainer =
-        document.getElementById("upcomingCustoms");
 
+/* =========================================================
+   TIME HELPERS
+========================================================= */
+
+function hasRegistrationStarted(custom) {
+
+    return Date.now() >=
+        new Date(custom.registrationStart).getTime();
+
+}
+
+
+function hasMatchStarted(custom) {
+
+    return Date.now() >=
+        new Date(custom.startTime).getTime();
+
+}
+
+
+function formatDate(dateString) {
+
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            month: "short",
+            day: "numeric"
+        }
+    );
+}
+
+
+function formatTime(dateString) {
+
+    const date = new Date(dateString);
+
+    return date.toLocaleTimeString(
+        undefined,
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+
+function formatDateTime(dateString) {
+
+    return `${formatDate(dateString)} · ${formatTime(dateString)}`;
+
+}
+
+
+/* =========================================================
+   REGISTRATION HELPERS
+========================================================= */
+
+function getCustomRegistrations(customId) {
+
+    return registrations.filter(
+        registration =>
+            registration.customId === customId
+    );
+
+}
+
+
+function getPlayerCount(customId) {
+
+    return getCustomRegistrations(customId).length;
+
+}
+
+
+function isFull(custom) {
+
+    return getPlayerCount(custom.id)
+        >= custom.playerLimit;
+
+}
+
+
+function getPlayerRegistration(customId) {
+
+    return registrations.find(
+        registration =>
+            registration.customId === customId
+    );
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render() {
+
+    customs = customs.filter(
+        custom => !hasMatchStarted(custom) || custom.type === "live"
+    );
+
+    renderLive();
+
+    renderUpcoming();
+
+}
+
+
+function renderLive() {
+
+    const live = customs.filter(
+        custom =>
+            custom.type === "live" &&
+            !hasMatchStarted(custom)
+    );
 
     liveContainer.innerHTML = "";
-    upcomingContainer.innerHTML = "";
 
-
-    const live =
-        customs.filter(custom => custom.type === "live");
-
-    const upcoming =
-        customs.filter(custom => custom.type === "upcoming");
+    liveCount.textContent = live.length;
 
 
     if (live.length === 0) {
 
-        liveContainer.innerHTML =
-            `<div class="empty">No live customs.</div>`;
+        liveContainer.innerHTML = `
+            <div class="empty-state">
+                No live customs
+            </div>
+        `;
 
-    } else {
-
-        live.forEach(custom => {
-
-            liveContainer.appendChild(
-                createCustomCard(custom)
-            );
-
-        });
-
+        return;
     }
 
 
-    if (upcoming.length === 0) {
+    live.forEach(custom => {
 
-        upcomingContainer.innerHTML =
-            `<div class="empty">No upcoming customs.</div>`;
+        liveContainer.appendChild(
+            createCustomCard(custom, "live")
+        );
 
-    } else {
-
-        upcoming.forEach(custom => {
-
-            upcomingContainer.appendChild(
-                createCustomCard(custom)
-            );
-
-        });
-
-    }
+    });
 
 }
 
 
-/* ==========================================
-   CREATE CARD
-   ========================================== */
+function renderUpcoming() {
 
-function createCustomCard(custom) {
+    const upcoming = customs.filter(
+        custom =>
+            custom.type === "upcoming"
+    );
 
-    const registered =
-        registrations.filter(
-            registration =>
-                registration.customId === custom.id
+    upcomingContainer.innerHTML = "";
+
+    upcomingCount.textContent = upcoming.length;
+
+
+    if (upcoming.length === 0) {
+
+        upcomingContainer.innerHTML = `
+            <div class="empty-state">
+                No upcoming customs
+            </div>
+        `;
+
+        return;
+    }
+
+
+    upcoming.forEach(custom => {
+
+        upcomingContainer.appendChild(
+            createCustomCard(custom, "upcoming")
         );
 
+    });
 
-    const currentPlayers =
-        registered.length;
-
-
-    const capacity =
-        Number(custom.players);
+}
 
 
-    const full =
-        currentPlayers >= capacity;
+/* =========================================================
+   CREATE CARD
+========================================================= */
 
+function createCustomCard(custom, type) {
 
-    const percentage =
-        capacity > 0
-            ? Math.min(
-                (currentPlayers / capacity) * 100,
-                100
-            )
-            : 0;
-
-
-    const card =
-        document.createElement("article");
+    const card = document.createElement("article");
 
     card.className = "custom-card";
 
 
+    const count = getPlayerCount(custom.id);
+
+    const full = count >= custom.playerLimit;
+
+    const registrationOpen =
+        hasRegistrationStarted(custom);
+
+
+    let buttonHTML = "";
+
+
+    /*
+       UPCOMING CUSTOM
+       Register button stays hidden
+       until registrationStart.
+    */
+
+    if (full) {
+
+        buttonHTML = `
+            <button
+                class="register-button"
+                disabled
+            >
+                CAPACITY FULL
+            </button>
+        `;
+
+    }
+
+    else if (registrationOpen) {
+
+        buttonHTML = `
+            <button
+                class="register-button"
+                data-register="${custom.id}"
+            >
+                REGISTER
+            </button>
+        `;
+
+    }
+
+    else {
+
+        buttonHTML = `
+            <button
+                class="details-button"
+                data-details="${custom.id}"
+            >
+                DETAILS
+            </button>
+        `;
+
+    }
+
+
+    let registrationInfo = "";
+
+
+    if (!registrationOpen) {
+
+        registrationInfo = `
+            <div class="registration-time">
+                Registration opens at
+                <span>
+                    ${formatDateTime(custom.registrationStart)}
+                </span>
+            </div>
+        `;
+
+    }
+
+    else {
+
+        registrationInfo = `
+            <div class="registration-time">
+                Registration is open
+            </div>
+        `;
+
+    }
+
+
     card.innerHTML = `
 
-        <div class="custom-top">
+        <div class="card-top">
 
-            <span class="status ${full ? "full" : "open"}">
-                ${full ? "CAPACITY FULL" : "REGISTRATION OPEN"}
-            </span>
+            <div class="status ${type}">
+                <span class="status-dot"></span>
 
-            <span class="custom-id">
-                ${custom.id.replace("custom-", "#")}
-            </span>
+                ${type === "live" ? "LIVE" : "UPCOMING"}
+            </div>
+
+            <button
+                class="details-button"
+                data-details="${custom.id}"
+            >
+                DETAILS
+            </button>
 
         </div>
 
 
-        <h3>
+        <h3 class="custom-title">
             ${escapeHTML(custom.title)}
         </h3>
 
 
-        <div class="card-data">
+        <div class="custom-meta">
 
-            <div class="data-item">
-                <span>PLAYERS</span>
-                <strong>
-                    ${currentPlayers} / ${capacity}
-                </strong>
-            </div>
+            <div class="meta-item">
 
-            <div class="data-item">
-                <span>START TIME</span>
-                <strong>
-                    ${escapeHTML(custom.startTime)}
-                </strong>
-            </div>
+                <span class="meta-label">
+                    Match Start
+                </span>
 
-        </div>
-
-
-        <div class="capacity">
-
-            <div class="capacity-info">
-
-                <span>Capacity</span>
-
-                <span>
-                    ${full
-                        ? "Full"
-                        : `${capacity - currentPlayers} spots left`
-                    }
+                <span class="meta-value">
+                    ${formatDateTime(custom.startTime)}
                 </span>
 
             </div>
 
-            <div class="progress">
 
-                <div
-                    class="progress-bar"
-                    style="width: ${percentage}%"
-                ></div>
+            <div class="meta-item">
+
+                <span class="meta-label">
+                    Players
+                </span>
+
+                <span class="meta-value">
+                    ${count} / ${custom.playerLimit}
+                </span>
 
             </div>
 
         </div>
 
 
-        <div class="card-actions">
+        ${registrationInfo}
 
-            <button
-                class="card-button"
-                data-details="${custom.id}"
-            >
-                Details
-            </button>
 
-            <button
-                class="card-button primary ${full ? "disabled" : ""}"
-                data-register="${custom.id}"
-                ${full ? "disabled" : ""}
-            >
-                ${full ? "Capacity Full" : "Register"}
-            </button>
+        <div class="card-bottom">
+
+            <div class="capacity">
+                <strong>${count}</strong>
+                /
+                ${custom.playerLimit}
+                players
+            </div>
+
+            ${buttonHTML}
 
         </div>
 
     `;
 
 
-    card
-        .querySelector("[data-details]")
-        .addEventListener("click", () => {
-
-            openDetails(custom);
-
-        });
-
+    /*
+       Register
+    */
 
     const registerButton =
-        card.querySelector("[data-register]");
+        card.querySelector(
+            "[data-register]"
+        );
 
-
-    if (!full) {
+    if (registerButton) {
 
         registerButton.addEventListener(
             "click",
@@ -350,276 +568,215 @@ function createCustomCard(custom) {
     }
 
 
+    /*
+       Details
+    */
+
+    const detailsButton =
+        card.querySelector(
+            "[data-details]"
+        );
+
+    if (detailsButton) {
+
+        detailsButton.addEventListener(
+            "click",
+            () => openDetails(custom)
+        );
+
+    }
+
+
     return card;
+
 }
 
 
-/* ==========================================
-   REGISTRATION
-   ========================================== */
-
-const registrationOverlay =
-    document.getElementById("registrationOverlay");
-
-const registrationForm =
-    document.getElementById("registrationForm");
-
+/* =========================================================
+   OPEN REGISTRATION
+========================================================= */
 
 function openRegistration(custom) {
 
-    const registered =
-        registrations.filter(
-            registration =>
-                registration.customId === custom.id
-        );
+    if (!hasRegistrationStarted(custom)) {
+        return;
+    }
 
-
-    if (registered.length >= Number(custom.players)) {
-
-        renderCustoms();
-
+    if (isFull(custom)) {
         return;
     }
 
 
-    document.getElementById("customId").value =
-        custom.id;
+    const existing =
+        getPlayerRegistration(custom.id);
 
-    document.getElementById("registrationTitle")
-        .textContent =
-        custom.title;
 
+    if (existing) {
+
+        alert(
+            "You are already registered for this custom."
+        );
+
+        return;
+
+    }
+
+
+    customIdInput.value = custom.id;
+
+    registerTitle.textContent = custom.title;
 
     registrationForm.reset();
 
-    document.getElementById("customId").value =
-        custom.id;
+    customIdInput.value = custom.id;
 
+    formError.textContent = "";
 
-    document.getElementById("starsGroup")
-        .classList.add("hidden");
+    starsGroup.classList.remove("visible");
 
+    registerModal.classList.add("active");
 
-    document.getElementById("formError")
-        .textContent = "";
-
-
-    registrationOverlay.classList.add("active");
-
-    document.body.style.overflow = "hidden";
 }
 
 
-function closeRegistration() {
+/* =========================================================
+   CLOSE MODALS
+========================================================= */
 
-    registrationOverlay.classList.remove("active");
+function closeModal(modal) {
 
-    document.body.style.overflow = "";
+    modal.classList.remove("active");
+
 }
 
 
-document.getElementById("closeRegistration")
+document
+    .getElementById("closeRegister")
     .addEventListener(
         "click",
-        closeRegistration
+        () => closeModal(registerModal)
     );
 
 
-/* ==========================================
-   TELEGRAM VALIDATION
-   ========================================== */
-
-function validateTelegram(value) {
-
-    return /^@[A-Za-z0-9_]{3,32}$/.test(value);
-}
+document
+    .getElementById("closeSuccess")
+    .addEventListener(
+        "click",
+        () => closeModal(successModal)
+    );
 
 
-/* ==========================================
-   GAME ID VALIDATION
-   ========================================== */
-
-function validateGameId(value) {
-
-    return /^\d{10}$/.test(value);
-}
+document
+    .getElementById("closeDetails")
+    .addEventListener(
+        "click",
+        () => closeModal(detailsModal)
+    );
 
 
-/* ==========================================
-   GAME ID INPUT
-   ========================================== */
+/*
+   Click outside modal
+*/
 
-document.getElementById("gameId")
-    .addEventListener("input", function () {
+[
+    registerModal,
+    successModal,
+    detailsModal
+].forEach(modal => {
 
-        this.value =
-            this.value.replace(/\D/g, "")
-                .slice(0, 10);
+    modal.addEventListener(
+        "click",
+        event => {
 
-    });
+            if (event.target === modal) {
+                closeModal(modal);
+            }
 
-
-/* ==========================================
-   RANK / STARS
-   ========================================== */
-
-const rankSelect =
-    document.getElementById("rank");
-
-rankSelect.addEventListener(
-    "change",
-    function () {
-
-        const mythicRanks = [
-            "Mythic",
-            "Mythical Honor",
-            "Mythical Glory",
-            "Mythical Immortal"
-        ];
-
-
-        const starsGroup =
-            document.getElementById("starsGroup");
-
-
-        const stars =
-            document.getElementById("stars");
-
-
-        if (mythicRanks.includes(this.value)) {
-
-            starsGroup.classList.remove("hidden");
-
-            stars.required = true;
-
-        } else {
-
-            starsGroup.classList.add("hidden");
-
-            stars.required = false;
-
-            stars.value = "";
         }
+    );
+
+});
+
+
+/* =========================================================
+   RANK / STARS
+========================================================= */
+
+rankInput.addEventListener(
+    "change",
+    updateStarsVisibility
+);
+
+
+function updateStarsVisibility() {
+
+    const ranksWithStars = [
+
+        "Mythic",
+        "Mythical Honor",
+        "Mythical Glory",
+        "Mythical Immortal"
+
+    ];
+
+
+    if (
+        ranksWithStars.includes(
+            rankInput.value
+        )
+    ) {
+
+        starsGroup.classList.add("visible");
+
+        starsInput.required = true;
+
+    }
+
+    else {
+
+        starsGroup.classList.remove("visible");
+
+        starsInput.required = false;
+
+        starsInput.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   GAME ID
+========================================================= */
+
+gameIdInput.addEventListener(
+    "input",
+    () => {
+
+        gameIdInput.value =
+            gameIdInput.value
+                .replace(/\D/g, "")
+                .slice(0, 10);
 
     }
 );
 
 
-/* ==========================================
-   SUBMIT REGISTRATION
-   ========================================== */
+/* =========================================================
+   FORM SUBMIT
+========================================================= */
 
 registrationForm.addEventListener(
     "submit",
-    function (event) {
+    event => {
 
         event.preventDefault();
 
-
-        const error =
-            document.getElementById("formError");
-
-
-        error.textContent = "";
+        formError.textContent = "";
 
 
         const customId =
-            document.getElementById("customId").value;
-
-
-        const telegram =
-            document.getElementById("telegram")
-                .value
-                .trim();
-
-
-        const gameId =
-            document.getElementById("gameId")
-                .value
-                .trim();
-
-
-        const role =
-            document.getElementById("role").value;
-
-
-        const rank =
-            document.getElementById("rank").value;
-
-
-        const stars =
-            document.getElementById("stars")
-                .value
-                .trim();
-
-
-        /* Telegram */
-
-        if (!validateTelegram(telegram)) {
-
-            error.textContent =
-                "Telegram ID must start with @.";
-
-            return;
-        }
-
-
-        /* Game ID */
-
-        if (!validateGameId(gameId)) {
-
-            error.textContent =
-                "Game ID must contain exactly 10 digits.";
-
-            return;
-        }
-
-
-        /* Role */
-
-        if (!role) {
-
-            error.textContent =
-                "Please select a role.";
-
-            return;
-        }
-
-
-        /* Rank */
-
-        if (!rank) {
-
-            error.textContent =
-                "Please select your highest rank.";
-
-            return;
-        }
-
-
-        /* Stars */
-
-        const mythicRanks = [
-            "Mythic",
-            "Mythical Honor",
-            "Mythical Glory",
-            "Mythical Immortal"
-        ];
-
-
-        if (
-            mythicRanks.includes(rank) &&
-            (!stars || !/^\d+$/.test(stars))
-        ) {
-
-            error.textContent =
-                "Please enter the number of stars.";
-
-            return;
-        }
-
-
-        /* Find custom */
+            customIdInput.value;
 
         const custom =
             customs.find(
@@ -629,76 +786,196 @@ registrationForm.addEventListener(
 
         if (!custom) {
 
-            error.textContent =
-                "This custom could not be found.";
+            formError.textContent =
+                "Custom not found.";
 
             return;
+
         }
 
 
-        /* Check capacity */
+        /*
+           Check registration time
+        */
 
-        const currentRegistrations =
-            registrations.filter(
-                item =>
-                    item.customId === customId
-            );
+        if (!hasRegistrationStarted(custom)) {
+
+            formError.textContent =
+                "Registration has not opened yet.";
+
+            return;
+
+        }
+
+
+        /*
+           Capacity
+        */
+
+        if (isFull(custom)) {
+
+            formError.textContent =
+                "This custom is full.";
+
+            return;
+
+        }
+
+
+        /*
+           Telegram
+        */
+
+        const telegram =
+            telegramInput.value.trim();
+
+
+        if (!/^@[A-Za-z0-9_]{3,32}$/.test(telegram)) {
+
+            formError.textContent =
+                "Enter a valid Telegram ID starting with @.";
+
+            return;
+
+        }
+
+
+        /*
+           Game ID
+        */
+
+        const gameId =
+            gameIdInput.value.trim();
+
+
+        if (!/^\d{10}$/.test(gameId)) {
+
+            formError.textContent =
+                "Game ID must contain exactly 10 digits.";
+
+            return;
+
+        }
+
+
+        /*
+           Role
+        */
+
+        if (!roleInput.value) {
+
+            formError.textContent =
+                "Please select a role.";
+
+            return;
+
+        }
+
+
+        /*
+           Rank
+        */
+
+        if (!rankInput.value) {
+
+            formError.textContent =
+                "Please select your highest rank.";
+
+            return;
+
+        }
+
+
+        /*
+           Stars
+        */
+
+        const ranksWithStars = [
+
+            "Mythic",
+            "Mythical Honor",
+            "Mythical Glory",
+            "Mythical Immortal"
+
+        ];
+
+
+        let stars = null;
 
 
         if (
-            currentRegistrations.length >=
-            Number(custom.players)
+            ranksWithStars.includes(
+                rankInput.value
+            )
         ) {
 
-            error.textContent =
-                "Capacity Full.";
+            stars =
+                Number(starsInput.value);
 
-            renderCustoms();
 
-            return;
+            if (
+                !Number.isInteger(stars) ||
+                stars < 0
+            ) {
+
+                formError.textContent =
+                    "Enter a valid number of stars.";
+
+                return;
+
+            }
+
         }
 
 
-        /* Duplicate Game ID */
+        /*
+           Duplicate Game ID
+        */
 
         const duplicateGameId =
             registrations.some(
-                item =>
-                    item.customId === customId &&
-                    item.gameId === gameId
+                registration =>
+                    registration.customId === customId &&
+                    registration.gameId === gameId
             );
 
 
         if (duplicateGameId) {
 
-            error.textContent =
+            formError.textContent =
                 "This Game ID is already registered.";
 
             return;
+
         }
 
 
-        /* Duplicate Telegram */
+        /*
+           Duplicate Telegram
+        */
 
         const duplicateTelegram =
             registrations.some(
-                item =>
-                    item.customId === customId &&
-                    item.telegram.toLowerCase() ===
-                    telegram.toLowerCase()
+                registration =>
+                    registration.customId === customId &&
+                    registration.telegram.toLowerCase()
+                    === telegram.toLowerCase()
             );
 
 
         if (duplicateTelegram) {
 
-            error.textContent =
+            formError.textContent =
                 "This Telegram ID is already registered.";
 
             return;
+
         }
 
 
-        /* Create registration */
+        /*
+           Save registration
+        */
 
         const registration = {
 
@@ -712,14 +989,11 @@ registrationForm.addEventListener(
 
             gameId,
 
-            role,
+            role: roleInput.value,
 
-            rank,
+            rank: rankInput.value,
 
-            stars:
-                mythicRanks.includes(rank)
-                    ? Number(stars)
-                    : null,
+            stars,
 
             createdAt:
                 new Date().toISOString()
@@ -729,308 +1003,187 @@ registrationForm.addEventListener(
 
         registrations.push(registration);
 
-        saveData();
+        saveRegistrations(registrations);
 
 
-        closeRegistration();
+        /*
+           Close registration modal
+        */
 
-        renderCustoms();
+        closeModal(registerModal);
 
-        openSuccess();
+
+        /*
+           Success
+        */
+
+        successText.textContent =
+            `${custom.title} · Game ID ${gameId}`;
+
+        successModal.classList.add("active");
+
+
+        render();
 
     }
 );
 
 
-/* ==========================================
-   SUCCESS
-   ========================================== */
+/* =========================================================
+   CANCEL REGISTRATION
+========================================================= */
 
-const successOverlay =
-    document.getElementById("successOverlay");
-
-
-function openSuccess() {
-
-    successOverlay.classList.add("active");
-
-    document.body.style.overflow = "hidden";
-}
-
-
-function closeSuccess() {
-
-    successOverlay.classList.remove("active");
-
-    document.body.style.overflow = "";
-}
-
-
-document.getElementById("successClose")
+document
+    .getElementById("cancelRegistration")
     .addEventListener(
         "click",
-        closeSuccess
+        () => {
+
+            const customId =
+                customIdInput.value;
+
+            /*
+               In this demo we use the most
+               recently registered player.
+            */
+
+            const registration =
+                registrations
+                    .filter(
+                        item =>
+                            item.customId === customId
+                    )
+                    .at(-1);
+
+
+            if (!registration) {
+
+                closeModal(successModal);
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Cancel your registration?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            registrations =
+                registrations.filter(
+                    item =>
+                        item.id !== registration.id
+                );
+
+
+            saveRegistrations(registrations);
+
+
+            closeModal(successModal);
+
+            render();
+
+            alert(
+                "Registration cancelled."
+            );
+
+        }
     );
 
 
-/* ==========================================
+/* =========================================================
    DETAILS
-   ========================================== */
-
-const detailsOverlay =
-    document.getElementById("detailsOverlay");
-
-
-let selectedDetailsCustom = null;
-
+========================================================= */
 
 function openDetails(custom) {
 
-    selectedDetailsCustom = custom;
+    const count =
+        getPlayerCount(custom.id);
 
 
-    const registered =
-        registrations.filter(
-            item =>
-                item.customId === custom.id
-        );
-
-
-    const full =
-        registered.length >= Number(custom.players);
-
-
-    document.getElementById("detailsTitle")
-        .textContent =
+    detailsTitle.textContent =
         custom.title;
 
 
-    document.getElementById("detailsTime")
-        .textContent =
-        custom.startTime;
+    detailsStatus.textContent =
+        custom.type === "live"
+            ? "LIVE"
+            : "UPCOMING";
 
 
-    document.getElementById("detailsPlayers")
-        .textContent =
-        `${registered.length} / ${custom.players}`;
+    detailsPlayers.textContent =
+        `${count} / ${custom.playerLimit}`;
 
 
-    document.getElementById("detailsStatus")
-        .textContent =
-        full
-            ? "Capacity Full"
-            : "Registration Open";
+    detailsStart.textContent =
+        formatDateTime(custom.startTime);
 
 
-    const button =
-        document.getElementById("detailsRegister");
+    if (hasRegistrationStarted(custom)) {
 
+        detailsRegistration.textContent =
+            "OPEN";
 
-    if (full) {
+    }
 
-        button.disabled = true;
+    else {
 
-        button.textContent =
-            "Capacity Full";
-
-        button.classList.remove("primary");
-
-    } else {
-
-        button.disabled = false;
-
-        button.textContent =
-            "Register";
+        detailsRegistration.textContent =
+            formatDateTime(
+                custom.registrationStart
+            );
 
     }
 
 
-    detailsOverlay.classList.add("active");
+    detailsModal.classList.add("active");
 
-    document.body.style.overflow = "hidden";
 }
 
 
-function closeDetails() {
-
-    detailsOverlay.classList.remove("active");
-
-    document.body.style.overflow = "";
-}
-
-
-document.getElementById("closeDetails")
-    .addEventListener(
-        "click",
-        closeDetails
-    );
-
-
-document.getElementById("detailsRegister")
-    .addEventListener(
-        "click",
-        function () {
-
-            if (!selectedDetailsCustom) {
-                return;
-            }
-
-
-            const custom =
-                selectedDetailsCustom;
-
-
-            closeDetails();
-
-            openRegistration(custom);
-
-        }
-    );
-
-
-/* ==========================================
-   CANCEL REGISTRATION
-   ========================================== */
-
-/*
-    Double click the logo to open the
-    cancellation window during testing.
-
-    This will later be replaced by the
-    player's registration management system.
-*/
-
-document.querySelector(".logo")
-    .addEventListener(
-        "dblclick",
-        function () {
-
-            document.getElementById(
-                "cancelOverlay"
-            ).classList.add("active");
-
-            document.body.style.overflow = "hidden";
-
-        }
-    );
-
-
-document.getElementById("closeCancel")
-    .addEventListener(
-        "click",
-        function () {
-
-            document.getElementById(
-                "cancelOverlay"
-            ).classList.remove("active");
-
-            document.body.style.overflow = "";
-
-        }
-    );
-
-
-document.getElementById("confirmCancel")
-    .addEventListener(
-        "click",
-        function () {
-
-            const telegram =
-                document.getElementById(
-                    "cancelTelegram"
-                ).value.trim();
-
-
-            const error =
-                document.getElementById(
-                    "cancelError"
-                );
-
-
-            error.textContent = "";
-
-
-            if (!validateTelegram(telegram)) {
-
-                error.textContent =
-                    "Enter a valid Telegram ID.";
-
-                return;
-            }
-
-
-            const index =
-                registrations.findIndex(
-                    registration =>
-                        registration.telegram.toLowerCase() ===
-                        telegram.toLowerCase()
-                );
-
-
-            if (index === -1) {
-
-                error.textContent =
-                    "No registration was found.";
-
-                return;
-            }
-
-
-            registrations.splice(index, 1);
-
-            saveData();
-
-            renderCustoms();
-
-
-            document.getElementById(
-                "cancelOverlay"
-            ).classList.remove("active");
-
-
-            document.body.style.overflow = "";
-
-        }
-    );
-
-
-/* ==========================================
-   ESCAPE
-   ========================================== */
-
-document.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (event.key !== "Escape") {
-            return;
-        }
-
-        closeRegistration();
-        closeDetails();
-        closeSuccess();
-
-    }
-);
-
-
-/* ==========================================
-   HTML ESCAPE
-   ========================================== */
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHTML(value) {
 
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    const div =
+        document.createElement("div");
+
+    div.textContent = value;
+
+    return div.innerHTML;
+
 }
 
 
-/* ==========================================
-   INITIALIZE
-   ========================================== */
+/* =========================================================
+   AUTOMATIC STATUS UPDATE
+========================================================= */
 
-renderCustoms();
+/*
+   Re-render every 5 seconds.
+
+   This means if an Upcoming custom reaches
+   its registrationStart time, the REGISTER
+   button appears automatically.
+*/
+
+setInterval(
+    render,
+    5000
+);
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
+
+render();
