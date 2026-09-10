@@ -8,360 +8,232 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header class="navbar">
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
 
-    <a href="#" class="logo">
-        SHADOW LEGENDS
-    </a>
-
-    <nav>
-        <a href="#live">Live Customs</a>
-        <a href="#upcoming">Upcoming</a>
-    </nav>
-
-</header>
-
-
-<main>
-
-    <section class="hero">
-        <h1>SHADOW LEGENDS</h1>
-    </section>
-
-
-    <section class="section" id="live">
-
-        <div class="section-title">
-            <h2>Live Customs</h2>
+    <header class="header">
+        <div class="logo">
+            <span class="logo-mark">S</span>
+            <span>SHADOW LEGENDS</span>
         </div>
+    </header>
 
-        <div class="custom-grid" id="liveCustoms"></div>
+    <main class="container">
 
-    </section>
+        <!-- LIVE -->
+        <section class="custom-section">
 
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-indicator live-indicator"></span>
+                    <h2>LIVE CUSTOMS</h2>
+                </div>
 
-    <section class="section" id="upcoming">
-
-        <div class="section-title">
-            <h2>Upcoming Customs</h2>
-        </div>
-
-        <div class="custom-grid" id="upcomingCustoms"></div>
-
-    </section>
-
-</main>
-
-
-<!-- Registration Modal -->
-
-<div class="overlay" id="registrationOverlay">
-
-    <div class="modal">
-
-        <button class="close-button" id="closeRegistration">×</button>
-
-        <div class="modal-header">
-            <span>REGISTRATION</span>
-            <h2 id="registrationTitle">Custom</h2>
-        </div>
-
-
-        <form id="registrationForm">
-
-            <input type="hidden" id="customId">
-
-
-            <div class="form-group">
-
-                <label for="telegram">
-                    Telegram ID
-                </label>
-
-                <input
-                    type="text"
-                    id="telegram"
-                    placeholder="@username"
-                    autocomplete="off"
-                    required
-                >
-
-                <small>
-                    Must start with @
-                </small>
-
+                <span class="section-count" id="liveCount">0</span>
             </div>
 
-
-            <div class="form-group">
-
-                <label for="gameId">
-                    Game ID
-                </label>
-
-                <input
-                    type="text"
-                    id="gameId"
-                    inputmode="numeric"
-                    maxlength="10"
-                    placeholder="1234567890"
-                    autocomplete="off"
-                    required
-                >
-
-                <small>
-                    Exactly 10 digits
-                </small>
-
+            <div class="custom-grid" id="liveCustoms">
+                <!-- Live customs inserted by JS -->
             </div>
 
+        </section>
 
-            <div class="form-group">
 
-                <label for="role">
-                    Role
-                </label>
+        <!-- UPCOMING -->
+        <section class="custom-section">
 
-                <select id="role" required>
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-indicator upcoming-indicator"></span>
+                    <h2>UPCOMING CUSTOMS</h2>
+                </div>
 
-                    <option value="" selected disabled>
-                        Select your role
-                    </option>
-
-                    <option value="EXP Lane">
-                        EXP Lane
-                    </option>
-
-                    <option value="Jungle">
-                        Jungle
-                    </option>
-
-                    <option value="Mid Lane">
-                        Mid Lane
-                    </option>
-
-                    <option value="Gold Lane">
-                        Gold Lane
-                    </option>
-
-                    <option value="Roam">
-                        Roam
-                    </option>
-
-                </select>
-
+                <span class="section-count" id="upcomingCount">0</span>
             </div>
 
-
-            <div class="form-group">
-
-                <label for="rank">
-                    Highest Rank
-                </label>
-
-                <select id="rank" required>
-
-                    <option value="" selected disabled>
-                        Select your rank
-                    </option>
-
-                    <option value="Epic">
-                        Epic
-                    </option>
-
-                    <option value="Legend">
-                        Legend
-                    </option>
-
-                    <option value="Mythic">
-                        Mythic
-                    </option>
-
-                    <option value="Mythical Honor">
-                        Mythical Honor
-                    </option>
-
-                    <option value="Mythical Glory">
-                        Mythical Glory
-                    </option>
-
-                    <option value="Mythical Immortal">
-                        Mythical Immortal
-                    </option>
-
-                </select>
-
+            <div class="custom-grid" id="upcomingCustoms">
+                <!-- Upcoming customs inserted by JS -->
             </div>
 
+        </section>
 
-            <div class="form-group hidden" id="starsGroup">
-
-                <label for="stars">
-                    Stars
-                </label>
-
-                <input
-                    type="number"
-                    id="stars"
-                    min="0"
-                    step="1"
-                    placeholder="Enter stars"
-                >
-
-            </div>
+    </main>
 
 
-            <div class="form-error" id="formError"></div>
+    <!-- REGISTER MODAL -->
+    <div class="modal-overlay" id="registerModal">
 
+        <div class="modal">
 
-            <button
-                type="submit"
-                class="submit-button"
-            >
-                Register
+            <button class="close-button" id="closeRegister">
+                ×
             </button>
 
-        </form>
+            <div class="modal-header">
+                <span class="modal-label">REGISTRATION</span>
+                <h2 id="registerTitle">Custom</h2>
+            </div>
 
-    </div>
+            <form id="registrationForm">
 
-</div>
+                <input type="hidden" id="customId">
 
+                <div class="form-group">
+                    <label for="telegram">Telegram ID</label>
+                    <input
+                        type="text"
+                        id="telegram"
+                        placeholder="@username"
+                        autocomplete="off"
+                        required
+                    >
+                    <small>Must start with @</small>
+                </div>
 
-<!-- Success Modal -->
+                <div class="form-group">
+                    <label for="gameId">Game ID</label>
+                    <input
+                        type="text"
+                        id="gameId"
+                        placeholder="1234567890"
+                        inputmode="numeric"
+                        maxlength="10"
+                        autocomplete="off"
+                        required
+                    >
+                    <small>Exactly 10 digits</small>
+                </div>
 
-<div class="overlay" id="successOverlay">
+                <div class="form-group">
+                    <label for="role">Role</label>
 
-    <div class="modal success-modal">
+                    <select id="role" required>
+                        <option value="">Select role</option>
+                        <option value="EXP Lane">EXP Lane</option>
+                        <option value="Jungle">Jungle</option>
+                        <option value="Mid Lane">Mid Lane</option>
+                        <option value="Gold Lane">Gold Lane</option>
+                        <option value="Roam">Roam</option>
+                    </select>
+                </div>
 
-        <div class="success-icon">
-            ✓
+                <div class="form-group">
+                    <label for="rank">Highest Rank</label>
+
+                    <select id="rank" required>
+                        <option value="">Select rank</option>
+                        <option value="Epic">Epic</option>
+                        <option value="Legend">Legend</option>
+                        <option value="Mythic">Mythic</option>
+                        <option value="Mythical Honor">Mythical Honor</option>
+                        <option value="Mythical Glory">Mythical Glory</option>
+                        <option value="Mythical Immortal">Mythical Immortal</option>
+                    </select>
+                </div>
+
+                <div class="form-group stars-group" id="starsGroup">
+
+                    <label for="stars">Stars</label>
+
+                    <input
+                        type="number"
+                        id="stars"
+                        min="0"
+                        max="999"
+                        placeholder="0"
+                    >
+
+                </div>
+
+                <div class="form-error" id="formError"></div>
+
+                <button type="submit" class="register-submit">
+                    REGISTER
+                </button>
+
+            </form>
+
         </div>
 
-        <h2>Registration Complete</h2>
+    </div>
 
-        <p>
-            Your registration has been saved.
-        </p>
 
-        <button
-            class="submit-button"
-            id="successClose"
-        >
-            Done
-        </button>
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+
+        <div class="modal success-modal">
+
+            <div class="success-icon">✓</div>
+
+            <span class="modal-label">REGISTRATION COMPLETE</span>
+
+            <h2>You are registered</h2>
+
+            <p id="successText"></p>
+
+            <button class="register-submit" id="closeSuccess">
+                DONE
+            </button>
+
+            <button class="cancel-link" id="cancelRegistration">
+                Cancel registration
+            </button>
+
+        </div>
 
     </div>
 
-</div>
 
+    <!-- DETAILS MODAL -->
+    <div class="modal-overlay" id="detailsModal">
 
-<!-- Registration Details Modal -->
+        <div class="modal">
 
-<div class="overlay" id="detailsOverlay">
+            <button class="close-button" id="closeDetails">
+                ×
+            </button>
 
-    <div class="modal">
+            <span class="modal-label">CUSTOM DETAILS</span>
 
-        <button class="close-button" id="closeDetails">×</button>
-
-        <div class="modal-header">
-            <span>CUSTOM</span>
             <h2 id="detailsTitle"></h2>
-        </div>
 
-        <div class="details-list">
+            <div class="details-list">
 
-            <div>
-                <span>START TIME</span>
-                <strong id="detailsTime"></strong>
+                <div class="detail-row">
+                    <span>Status</span>
+                    <strong id="detailsStatus"></strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Players</span>
+                    <strong id="detailsPlayers"></strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Match Start</span>
+                    <strong id="detailsStart"></strong>
+                </div>
+
+                <div class="detail-row">
+                    <span>Registration</span>
+                    <strong id="detailsRegistration"></strong>
+                </div>
+
             </div>
-
-            <div>
-                <span>PLAYERS</span>
-                <strong id="detailsPlayers"></strong>
-            </div>
-
-            <div>
-                <span>STATUS</span>
-                <strong id="detailsStatus"></strong>
-            </div>
-
-        </div>
-
-        <button
-            class="submit-button"
-            id="detailsRegister"
-        >
-            Register
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- Cancel Registration -->
-
-<div class="overlay" id="cancelOverlay">
-
-    <div class="modal">
-
-        <div class="modal-header">
-            <span>REGISTRATION</span>
-            <h2>Cancel Registration</h2>
-        </div>
-
-        <p class="cancel-text">
-            Enter the Telegram ID used for your registration.
-        </p>
-
-        <div class="form-group">
-
-            <label for="cancelTelegram">
-                Telegram ID
-            </label>
-
-            <input
-                type="text"
-                id="cancelTelegram"
-                placeholder="@username"
-            >
-
-        </div>
-
-        <div class="form-error" id="cancelError"></div>
-
-        <div class="modal-actions">
-
-            <button
-                class="secondary-button"
-                id="closeCancel"
-            >
-                Close
-            </button>
-
-            <button
-                class="danger-button"
-                id="confirmCancel"
-            >
-                Cancel Registration
-            </button>
 
         </div>
 
     </div>
 
-</div>
 
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
