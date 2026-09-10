@@ -4,432 +4,364 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Shadow Legends | Mobile Legends Customs</title>
+    <title>Shadow Legends</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Background -->
-    <div class="background-glow glow-one"></div>
-    <div class="background-glow glow-two"></div>
+<header class="navbar">
 
-    <!-- Navigation -->
-    <header class="navbar">
-        <a href="#" class="brand">
-            <span class="brand-mark">SL</span>
-            <span class="brand-name">SHADOW <strong>LEGENDS</strong></span>
-        </a>
+    <a href="#" class="logo">
+        SHADOW LEGENDS
+    </a>
 
-        <nav>
-            <a href="#live">Live Customs</a>
-            <a href="#upcoming">Upcoming</a>
-        </nav>
+    <nav>
+        <a href="#live">Live Customs</a>
+        <a href="#upcoming">Upcoming</a>
+    </nav>
 
-        <button class="nav-button" onclick="scrollToCustoms()">
-            Join a Custom
-        </button>
-    </header>
+</header>
 
 
-    <!-- Hero -->
-    <main>
+<main>
 
-        <section class="hero">
-
-            <div class="hero-content">
-
-                <div class="eyebrow">
-                    <span class="status-dot"></span>
-                    MOBILE LEGENDS CUSTOMS
-                </div>
-
-                <h1>
-                    PLAY.
-                    <span>COMPETE.</span>
-                    <br>
-                    MAKE LEGENDS.
-                </h1>
-
-                <p>
-                    Find your next Mobile Legends custom match,
-                    choose your role, and step into the battlefield.
-                </p>
-
-                <div class="hero-actions">
-                    <button class="primary-button" onclick="scrollToCustoms()">
-                        Explore Customs
-                        <span>→</span>
-                    </button>
-
-                    <a href="#upcoming" class="secondary-button">
-                        View Upcoming
-                    </a>
-                </div>
-
-            </div>
-
-            <div class="hero-decoration">
-
-                <div class="orbit orbit-one"></div>
-                <div class="orbit orbit-two"></div>
-
-                <div class="hero-card">
-                    <span>SHADOW</span>
-                    <strong>LEGENDS</strong>
-                    <small>MLBB CUSTOMS</small>
-                </div>
-
-            </div>
-
-        </section>
+    <section class="hero">
+        <h1>SHADOW LEGENDS</h1>
+    </section>
 
 
-        <!-- Live Customs -->
-        <section class="custom-section" id="live">
+    <section class="section" id="live">
 
-            <div class="section-heading">
+        <div class="section-title">
+            <h2>Live Customs</h2>
+        </div>
 
-                <div>
-                    <span class="section-label">LIVE NOW</span>
-                    <h2>Customs in Progress</h2>
-                    <p>Jump into an active registration and claim your spot.</p>
-                </div>
+        <div class="custom-grid" id="liveCustoms"></div>
 
-                <div class="live-indicator">
-                    <span></span>
-                    LIVE
-                </div>
+    </section>
+
+
+    <section class="section" id="upcoming">
+
+        <div class="section-title">
+            <h2>Upcoming Customs</h2>
+        </div>
+
+        <div class="custom-grid" id="upcomingCustoms"></div>
+
+    </section>
+
+</main>
+
+
+<!-- Registration Modal -->
+
+<div class="overlay" id="registrationOverlay">
+
+    <div class="modal">
+
+        <button class="close-button" id="closeRegistration">×</button>
+
+        <div class="modal-header">
+            <span>REGISTRATION</span>
+            <h2 id="registrationTitle">Custom</h2>
+        </div>
+
+
+        <form id="registrationForm">
+
+            <input type="hidden" id="customId">
+
+
+            <div class="form-group">
+
+                <label for="telegram">
+                    Telegram ID
+                </label>
+
+                <input
+                    type="text"
+                    id="telegram"
+                    placeholder="@username"
+                    autocomplete="off"
+                    required
+                >
+
+                <small>
+                    Must start with @
+                </small>
 
             </div>
 
 
-            <div class="custom-grid">
+            <div class="form-group">
 
-                <!-- Custom Card -->
-                <article class="custom-card live-card">
+                <label for="gameId">
+                    Game ID
+                </label>
 
-                    <div class="card-top">
+                <input
+                    type="text"
+                    id="gameId"
+                    inputmode="numeric"
+                    maxlength="10"
+                    placeholder="1234567890"
+                    autocomplete="off"
+                    required
+                >
 
-                        <div class="custom-status">
-                            <span class="live-dot"></span>
-                            REGISTRATION OPEN
-                        </div>
-
-                        <span class="custom-number">#001</span>
-
-                    </div>
-
-
-                    <div class="custom-title">
-                        <span>SHADOW LEGENDS</span>
-                        <h3>Nightfall Custom</h3>
-                    </div>
-
-
-                    <div class="match-info">
-
-                        <div class="info-item">
-                            <span>STARTS IN</span>
-                            <strong class="countdown" data-time="3600">
-                                01:00:00
-                            </strong>
-                        </div>
-
-                        <div class="info-item">
-                            <span>PLAYERS</span>
-                            <strong>7 / 10</strong>
-                        </div>
-
-                    </div>
-
-
-                    <div class="capacity">
-
-                        <div class="capacity-header">
-                            <span>Player Capacity</span>
-                            <span>70%</span>
-                        </div>
-
-                        <div class="progress">
-                            <div style="width: 70%"></div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-footer">
-
-                        <span class="open-status">
-                            3 spots available
-                        </span>
-
-                        <button
-                            class="join-button"
-                            onclick="openCustom('Nightfall Custom', '7', '10', 'Today • 21:00')"
-                        >
-                            View Custom
-                            <span>→</span>
-                        </button>
-
-                    </div>
-
-                </article>
-
-
-                <!-- Second Custom -->
-                <article class="custom-card live-card">
-
-                    <div class="card-top">
-
-                        <div class="custom-status">
-                            <span class="live-dot"></span>
-                            REGISTRATION OPEN
-                        </div>
-
-                        <span class="custom-number">#002</span>
-
-                    </div>
-
-
-                    <div class="custom-title">
-                        <span>SHADOW LEGENDS</span>
-                        <h3>Midnight Clash</h3>
-                    </div>
-
-
-                    <div class="match-info">
-
-                        <div class="info-item">
-                            <span>STARTS IN</span>
-                            <strong class="countdown" data-time="7200">
-                                02:00:00
-                            </strong>
-                        </div>
-
-                        <div class="info-item">
-                            <span>PLAYERS</span>
-                            <strong>4 / 10</strong>
-                        </div>
-
-                    </div>
-
-
-                    <div class="capacity">
-
-                        <div class="capacity-header">
-                            <span>Player Capacity</span>
-                            <span>40%</span>
-                        </div>
-
-                        <div class="progress">
-                            <div style="width: 40%"></div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-footer">
-
-                        <span class="open-status">
-                            6 spots available
-                        </span>
-
-                        <button
-                            class="join-button"
-                            onclick="openCustom('Midnight Clash', '4', '10', 'Today • 23:00')"
-                        >
-                            View Custom
-                            <span>→</span>
-                        </button>
-
-                    </div>
-
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- Upcoming -->
-        <section class="custom-section upcoming-section" id="upcoming">
-
-            <div class="section-heading">
-
-                <div>
-                    <span class="section-label">COMING SOON</span>
-                    <h2>Upcoming Customs</h2>
-                    <p>Prepare yourself for the next battle.</p>
-                </div>
+                <small>
+                    Exactly 10 digits
+                </small>
 
             </div>
 
 
-            <div class="upcoming-list">
+            <div class="form-group">
 
-                <article class="upcoming-card">
+                <label for="role">
+                    Role
+                </label>
 
-                    <div class="date-box">
-                        <span>SEP</span>
-                        <strong>11</strong>
-                    </div>
+                <select id="role" required>
 
-                    <div class="upcoming-main">
-                        <span>SHADOW LEGENDS</span>
-                        <h3>After Dark</h3>
-                        <p>Registration opens soon</p>
-                    </div>
+                    <option value="" selected disabled>
+                        Select your role
+                    </option>
 
-                    <div class="upcoming-time">
-                        <span>START TIME</span>
-                        <strong>21:00</strong>
-                    </div>
+                    <option value="EXP Lane">
+                        EXP Lane
+                    </option>
 
-                    <button
-                        class="details-button"
-                        onclick="openCustom('After Dark', '0', '10', 'September 11 • 21:00')"
-                    >
-                        Details
-                    </button>
+                    <option value="Jungle">
+                        Jungle
+                    </option>
 
-                </article>
+                    <option value="Mid Lane">
+                        Mid Lane
+                    </option>
 
+                    <option value="Gold Lane">
+                        Gold Lane
+                    </option>
 
-                <article class="upcoming-card">
+                    <option value="Roam">
+                        Roam
+                    </option>
 
-                    <div class="date-box">
-                        <span>SEP</span>
-                        <strong>12</strong>
-                    </div>
-
-                    <div class="upcoming-main">
-                        <span>SHADOW LEGENDS</span>
-                        <h3>Royal Rumble</h3>
-                        <p>Registration opens soon</p>
-                    </div>
-
-                    <div class="upcoming-time">
-                        <span>START TIME</span>
-                        <strong>22:00</strong>
-                    </div>
-
-                    <button
-                        class="details-button"
-                        onclick="openCustom('Royal Rumble', '0', '10', 'September 12 • 22:00')"
-                    >
-                        Details
-                    </button>
-
-                </article>
+                </select>
 
             </div>
 
-        </section>
 
+            <div class="form-group">
 
-        <!-- About -->
-        <section class="about-section">
+                <label for="rank">
+                    Highest Rank
+                </label>
 
-            <div class="about-box">
+                <select id="rank" required>
 
-                <span class="section-label">THE BATTLEFIELD</span>
+                    <option value="" selected disabled>
+                        Select your rank
+                    </option>
 
-                <h2>
-                    Your next game
-                    <span>starts here.</span>
-                </h2>
+                    <option value="Epic">
+                        Epic
+                    </option>
 
-                <p>
-                    Shadow Legends brings Mobile Legends players together
-                    for organized custom matches. Pick your role,
-                    secure your position, and prepare for battle.
-                </p>
+                    <option value="Legend">
+                        Legend
+                    </option>
+
+                    <option value="Mythic">
+                        Mythic
+                    </option>
+
+                    <option value="Mythical Honor">
+                        Mythical Honor
+                    </option>
+
+                    <option value="Mythical Glory">
+                        Mythical Glory
+                    </option>
+
+                    <option value="Mythical Immortal">
+                        Mythical Immortal
+                    </option>
+
+                </select>
 
             </div>
 
-        </section>
 
-    </main>
+            <div class="form-group hidden" id="starsGroup">
+
+                <label for="stars">
+                    Stars
+                </label>
+
+                <input
+                    type="number"
+                    id="stars"
+                    min="0"
+                    step="1"
+                    placeholder="Enter stars"
+                >
+
+            </div>
 
 
-    <!-- Custom Modal -->
-    <div class="modal-overlay" id="customModal">
+            <div class="form-error" id="formError"></div>
 
-        <div class="custom-modal">
 
-            <button class="close-modal" onclick="closeCustom()">
-                ×
+            <button
+                type="submit"
+                class="submit-button"
+            >
+                Register
             </button>
 
-            <span class="section-label">CUSTOM MATCH</span>
+        </form>
 
-            <h2 id="modalTitle">
-                Nightfall Custom
-            </h2>
+    </div>
 
-            <div class="modal-details">
+</div>
 
-                <div>
-                    <span>DATE & TIME</span>
-                    <strong id="modalTime">Today • 21:00</strong>
-                </div>
 
-                <div>
-                    <span>PLAYERS</span>
-                    <strong id="modalPlayers">7 / 10</strong>
-                </div>
+<!-- Success Modal -->
 
+<div class="overlay" id="successOverlay">
+
+    <div class="modal success-modal">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>Registration Complete</h2>
+
+        <p>
+            Your registration has been saved.
+        </p>
+
+        <button
+            class="submit-button"
+            id="successClose"
+        >
+            Done
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- Registration Details Modal -->
+
+<div class="overlay" id="detailsOverlay">
+
+    <div class="modal">
+
+        <button class="close-button" id="closeDetails">×</button>
+
+        <div class="modal-header">
+            <span>CUSTOM</span>
+            <h2 id="detailsTitle"></h2>
+        </div>
+
+        <div class="details-list">
+
+            <div>
+                <span>START TIME</span>
+                <strong id="detailsTime"></strong>
             </div>
 
-            <div class="modal-capacity">
-
-                <div class="modal-capacity-title">
-                    <span>Capacity</span>
-                    <span id="modalCapacity">3 spots left</span>
-                </div>
-
-                <div class="progress">
-                    <div id="modalProgress"></div>
-                </div>
-
+            <div>
+                <span>PLAYERS</span>
+                <strong id="detailsPlayers"></strong>
             </div>
 
-            <button class="modal-join" onclick="startRegistration()">
-                Join This Custom
-                <span>→</span>
+            <div>
+                <span>STATUS</span>
+                <strong id="detailsStatus"></strong>
+            </div>
+
+        </div>
+
+        <button
+            class="submit-button"
+            id="detailsRegister"
+        >
+            Register
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- Cancel Registration -->
+
+<div class="overlay" id="cancelOverlay">
+
+    <div class="modal">
+
+        <div class="modal-header">
+            <span>REGISTRATION</span>
+            <h2>Cancel Registration</h2>
+        </div>
+
+        <p class="cancel-text">
+            Enter the Telegram ID used for your registration.
+        </p>
+
+        <div class="form-group">
+
+            <label for="cancelTelegram">
+                Telegram ID
+            </label>
+
+            <input
+                type="text"
+                id="cancelTelegram"
+                placeholder="@username"
+            >
+
+        </div>
+
+        <div class="form-error" id="cancelError"></div>
+
+        <div class="modal-actions">
+
+            <button
+                class="secondary-button"
+                id="closeCancel"
+            >
+                Close
+            </button>
+
+            <button
+                class="danger-button"
+                id="confirmCancel"
+            >
+                Cancel Registration
             </button>
 
         </div>
 
     </div>
 
-
-    <!-- Footer -->
-    <footer>
-
-        <div class="footer-brand">
-            <span class="brand-mark">SL</span>
-
-            <div>
-                <strong>SHADOW LEGENDS</strong>
-                <small>Mobile Legends Customs</small>
-            </div>
-        </div>
-
-        <p>
-            © 2026 Shadow Legends. Built for the battlefield.
-        </p>
-
-    </footer>
+</div>
 
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-  </html>
+</html>
