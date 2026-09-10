@@ -1,1189 +1,1184 @@
-/* =========================================================
-   SHADOW LEGENDS
-   Frontend Tournament System
-========================================================= */
-
-
-/* =========================================================
-   STORAGE
-========================================================= */
-
-const CUSTOMS_KEY = "shadow_legends_customs_v2";
-const REGISTRATIONS_KEY = "shadow_legends_registrations_v2";
-
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const liveContainer = document.getElementById("liveCustoms");
-const upcomingContainer = document.getElementById("upcomingCustoms");
-
-const liveCount = document.getElementById("liveCount");
-const upcomingCount = document.getElementById("upcomingCount");
-
-const registerModal = document.getElementById("registerModal");
-const successModal = document.getElementById("successModal");
-const detailsModal = document.getElementById("detailsModal");
-
-const registrationForm = document.getElementById("registrationForm");
-
-const customIdInput = document.getElementById("customId");
-const registerTitle = document.getElementById("registerTitle");
-
-const telegramInput = document.getElementById("telegram");
-const gameIdInput = document.getElementById("gameId");
-const roleInput = document.getElementById("role");
-const rankInput = document.getElementById("rank");
-
-const starsGroup = document.getElementById("starsGroup");
-const starsInput = document.getElementById("stars");
-
-const formError = document.getElementById("formError");
-
-const successText = document.getElementById("successText");
-
-const detailsTitle = document.getElementById("detailsTitle");
-const detailsStatus = document.getElementById("detailsStatus");
-const detailsPlayers = document.getElementById("detailsPlayers");
-const detailsStart = document.getElementById("detailsStart");
-const detailsRegistration = document.getElementById("detailsRegistration");
-
-
-/* =========================================================
-   DEMO CUSTOMS
-   These are only for testing.
-   Later they can come from Supabase.
-========================================================= */
-
-function createDemoCustoms() {
-
-    const now = new Date();
-
-    const liveStart = new Date(
-        now.getTime() + 90 * 60 * 1000
-    );
-
-    const liveRegistration = new Date(
-        now.getTime() - 30 * 60 * 1000
-    );
-
-    const upcomingStart = new Date(
-        now.getTime() + 5 * 60 * 60 * 1000
-    );
-
-    const upcomingRegistration = new Date(
-        now.getTime() + 90 * 60 * 1000
-    );
-
-    const tomorrow = new Date(
-        now.getTime() + 24 * 60 * 60 * 1000
-    );
-
-    const tomorrowRegistration = new Date(
-        now.getTime() + 20 * 60 * 60 * 1000
-    );
-
-
-    return [
-
-        {
-            id: "custom-001",
-            title: "Shadow Custom #001",
-            playerLimit: 10,
-
-            startTime: liveStart.toISOString(),
-            registrationStart: liveRegistration.toISOString(),
-
-            type: "live"
-        },
-
-        {
-            id: "custom-002",
-            title: "Shadow Custom #002",
-            playerLimit: 10,
-
-            startTime: upcomingStart.toISOString(),
-            registrationStart: upcomingRegistration.toISOString(),
-
-            type: "upcoming"
-        },
-
-        {
-            id: "custom-003",
-            title: "Shadow Custom #003",
-            playerLimit: 10,
-
-            startTime: tomorrow.toISOString(),
-            registrationStart: tomorrowRegistration.toISOString(),
-
-            type: "upcoming"
-        }
-
-    ];
-}
-
-
-/* =========================================================
-   LOAD DATA
-========================================================= */
-
-function loadCustoms() {
-
-    const saved = localStorage.getItem(CUSTOMS_KEY);
-
-    if (saved) {
-
-        try {
-
-            return JSON.parse(saved);
-
-        } catch (error) {
-
-            console.error("Invalid custom data");
-
-        }
-
-    }
-
-    const demo = createDemoCustoms();
-
-    localStorage.setItem(
-        CUSTOMS_KEY,
-        JSON.stringify(demo)
-    );
-
-    return demo;
-}
-
-
-function loadRegistrations() {
-
-    const saved = localStorage.getItem(
-        REGISTRATIONS_KEY
-    );
-
-    if (!saved) {
-        return [];
-    }
-
-    try {
-
-        return JSON.parse(saved);
-
-    } catch (error) {
-
-        return [];
-
-    }
-}
-
-
-function saveRegistrations(data) {
-
-    localStorage.setItem(
-        REGISTRATIONS_KEY,
-        JSON.stringify(data)
-    );
-}
-
-
-/* =========================================================
-   GLOBAL DATA
-========================================================= */
-
-let customs = loadCustoms();
-
-let registrations = loadRegistrations();
-
-
-/* =========================================================
-   TIME HELPERS
-========================================================= */
-
-function hasRegistrationStarted(custom) {
-
-    return Date.now() >=
-        new Date(custom.registrationStart).getTime();
-
-}
-
-
-function hasMatchStarted(custom) {
-
-    return Date.now() >=
-        new Date(custom.startTime).getTime();
-
-}
-
-
-function formatDate(dateString) {
-
-    const date = new Date(dateString);
-
-    return date.toLocaleDateString(
-        undefined,
-        {
-            month: "short",
-            day: "numeric"
-        }
-    );
-}
-
-
-function formatTime(dateString) {
-
-    const date = new Date(dateString);
-
-    return date.toLocaleTimeString(
-        undefined,
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-
-}
-
-
-function formatDateTime(dateString) {
-
-    return `${formatDate(dateString)} · ${formatTime(dateString)}`;
-
-}
-
-
-/* =========================================================
-   REGISTRATION HELPERS
-========================================================= */
-
-function getCustomRegistrations(customId) {
-
-    return registrations.filter(
-        registration =>
-            registration.customId === customId
-    );
-
-}
-
-
-function getPlayerCount(customId) {
-
-    return getCustomRegistrations(customId).length;
-
-}
-
-
-function isFull(custom) {
-
-    return getPlayerCount(custom.id)
-        >= custom.playerLimit;
-
-}
-
-
-function getPlayerRegistration(customId) {
-
-    return registrations.find(
-        registration =>
-            registration.customId === customId
-    );
-
-}
-
-
-/* =========================================================
-   RENDER
-========================================================= */
-
-function render() {
-
-    customs = customs.filter(
-        custom => !hasMatchStarted(custom) || custom.type === "live"
-    );
-
-    renderLive();
-
-    renderUpcoming();
-
-}
-
-
-function renderLive() {
-
-    const live = customs.filter(
-        custom =>
-            custom.type === "live" &&
-            !hasMatchStarted(custom)
-    );
-
-    liveContainer.innerHTML = "";
-
-    liveCount.textContent = live.length;
-
-
-    if (live.length === 0) {
-
-        liveContainer.innerHTML = `
-            <div class="empty-state">
-                No live customs
-            </div>
-        `;
-
-        return;
-    }
-
-
-    live.forEach(custom => {
-
-        liveContainer.appendChild(
-            createCustomCard(custom, "live")
-        );
-
-    });
-
-}
-
-
-function renderUpcoming() {
-
-    const upcoming = customs.filter(
-        custom =>
-            custom.type === "upcoming"
-    );
-
-    upcomingContainer.innerHTML = "";
-
-    upcomingCount.textContent = upcoming.length;
-
-
-    if (upcoming.length === 0) {
-
-        upcomingContainer.innerHTML = `
-            <div class="empty-state">
-                No upcoming customs
-            </div>
-        `;
-
-        return;
-    }
-
-
-    upcoming.forEach(custom => {
-
-        upcomingContainer.appendChild(
-            createCustomCard(custom, "upcoming")
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   CREATE CARD
-========================================================= */
-
-function createCustomCard(custom, type) {
-
-    const card = document.createElement("article");
-
-    card.className = "custom-card";
-
-
-    const count = getPlayerCount(custom.id);
-
-    const full = count >= custom.playerLimit;
-
-    const registrationOpen =
-        hasRegistrationStarted(custom);
-
-
-    let buttonHTML = "";
-
-
-    /*
-       UPCOMING CUSTOM
-       Register button stays hidden
-       until registrationStart.
-    */
-
-    if (full) {
-
-        buttonHTML = `
-            <button
-                class="register-button"
-                disabled
-            >
-                CAPACITY FULL
-            </button>
-        `;
-
-    }
-
-    else if (registrationOpen) {
-
-        buttonHTML = `
-            <button
-                class="register-button"
-                data-register="${custom.id}"
-            >
-                REGISTER
-            </button>
-        `;
-
-    }
-
-    else {
-
-        buttonHTML = `
-            <button
-                class="details-button"
-                data-details="${custom.id}"
-            >
-                DETAILS
-            </button>
-        `;
-
-    }
-
-
-    let registrationInfo = "";
-
-
-    if (!registrationOpen) {
-
-        registrationInfo = `
-            <div class="registration-time">
-                Registration opens at
-                <span>
-                    ${formatDateTime(custom.registrationStart)}
-                </span>
-            </div>
-        `;
-
-    }
-
-    else {
-
-        registrationInfo = `
-            <div class="registration-time">
-                Registration is open
-            </div>
-        `;
-
-    }
-
-
-    card.innerHTML = `
-
-        <div class="card-top">
-
-            <div class="status ${type}">
-                <span class="status-dot"></span>
-
-                ${type === "live" ? "LIVE" : "UPCOMING"}
-            </div>
-
-            <button
-                class="details-button"
-                data-details="${custom.id}"
-            >
-                DETAILS
-            </button>
-
-        </div>
-
-
-        <h3 class="custom-title">
-            ${escapeHTML(custom.title)}
-        </h3>
-
-
-        <div class="custom-meta">
-
-            <div class="meta-item">
-
-                <span class="meta-label">
-                    Match Start
-                </span>
-
-                <span class="meta-value">
-                    ${formatDateTime(custom.startTime)}
-                </span>
-
-            </div>
-
-
-            <div class="meta-item">
-
-                <span class="meta-label">
-                    Players
-                </span>
-
-                <span class="meta-value">
-                    ${count} / ${custom.playerLimit}
-                </span>
-
-            </div>
-
-        </div>
-
-
-        ${registrationInfo}
-
-
-        <div class="card-bottom">
-
-            <div class="capacity">
-                <strong>${count}</strong>
-                /
-                ${custom.playerLimit}
-                players
-            </div>
-
-            ${buttonHTML}
-
-        </div>
-
-    `;
-
-
-    /*
-       Register
-    */
-
-    const registerButton =
-        card.querySelector(
-            "[data-register]"
-        );
-
-    if (registerButton) {
-
-        registerButton.addEventListener(
-            "click",
-            () => openRegistration(custom)
-        );
-
-    }
-
-
-    /*
-       Details
-    */
-
-    const detailsButton =
-        card.querySelector(
-            "[data-details]"
-        );
-
-    if (detailsButton) {
-
-        detailsButton.addEventListener(
-            "click",
-            () => openDetails(custom)
-        );
-
-    }
-
-
-    return card;
-
-}
-
-
-/* =========================================================
-   OPEN REGISTRATION
-========================================================= */
-
-function openRegistration(custom) {
-
-    if (!hasRegistrationStarted(custom)) {
-        return;
-    }
-
-    if (isFull(custom)) {
-        return;
-    }
-
-
-    const existing =
-        getPlayerRegistration(custom.id);
-
-
-    if (existing) {
-
-        alert(
-            "You are already registered for this custom."
-        );
-
-        return;
-
-    }
-
-
-    customIdInput.value = custom.id;
-
-    registerTitle.textContent = custom.title;
-
-    registrationForm.reset();
-
-    customIdInput.value = custom.id;
-
-    formError.textContent = "";
-
-    starsGroup.classList.remove("visible");
-
-    registerModal.classList.add("active");
-
-}
-
-
-/* =========================================================
-   CLOSE MODALS
-========================================================= */
-
-function closeModal(modal) {
-
-    modal.classList.remove("active");
-
-}
-
-
-document
-    .getElementById("closeRegister")
-    .addEventListener(
-        "click",
-        () => closeModal(registerModal)
-    );
-
-
-document
-    .getElementById("closeSuccess")
-    .addEventListener(
-        "click",
-        () => closeModal(successModal)
-    );
-
-
-document
-    .getElementById("closeDetails")
-    .addEventListener(
-        "click",
-        () => closeModal(detailsModal)
-    );
-
-
 /*
-   Click outside modal
+  SHADOW LEGENDS
+
+  IMPORTANT:
+  This frontend does NOT contain an admin password.
+
+  For production:
+  connect Supabase Auth here.
 */
 
-[
-    registerModal,
-    successModal,
-    detailsModal
-].forEach(modal => {
 
-    modal.addEventListener(
-        "click",
-        event => {
+const CUSTOMS_KEY = "shadow_legends_customs_v3";
+const REGISTRATIONS_KEY = "shadow_legends_registrations_v3";
 
-            if (event.target === modal) {
-                closeModal(modal);
-            }
 
-        }
+// --------------------------------------------------
+// ELEMENTS
+// --------------------------------------------------
+
+const liveCustoms = document.getElementById("liveCustoms");
+const upcomingCustoms = document.getElementById("upcomingCustoms");
+
+const registerModal = document.getElementById("registerModal");
+const detailsModal = document.getElementById("detailsModal");
+const successModal = document.getElementById("successModal");
+const adminLoginModal = document.getElementById("adminLoginModal");
+const adminScreen = document.getElementById("adminScreen");
+
+const registrationForm = document.getElementById("registrationForm");
+const adminLoginForm = document.getElementById("adminLoginForm");
+const customForm = document.getElementById("customForm");
+
+const rankSelect = document.getElementById("rank");
+const starsContainer = document.getElementById("starsContainer");
+
+
+// --------------------------------------------------
+// STORAGE
+// --------------------------------------------------
+
+function getCustoms() {
+  return JSON.parse(localStorage.getItem(CUSTOMS_KEY) || "[]");
+}
+
+function saveCustoms(customs) {
+  localStorage.setItem(CUSTOMS_KEY, JSON.stringify(customs));
+}
+
+function getRegistrations() {
+  return JSON.parse(localStorage.getItem(REGISTRATIONS_KEY) || "[]");
+}
+
+function saveRegistrations(registrations) {
+  localStorage.setItem(
+    REGISTRATIONS_KEY,
+    JSON.stringify(registrations)
+  );
+}
+
+
+// --------------------------------------------------
+// DEMO DATA
+// --------------------------------------------------
+
+function createDemoData() {
+
+  if (getCustoms().length) return;
+
+  const now = new Date();
+
+  const liveStart = new Date(now.getTime() - 60 * 60 * 1000);
+  const liveMatch = new Date(now.getTime() + 60 * 60 * 1000);
+
+  const upcomingStart = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const upcomingMatch = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+
+  const customs = [
+
+    {
+      id: crypto.randomUUID(),
+      title: "Shadow Legends #01",
+      capacity: 10,
+      registrationStart: liveStart.toISOString(),
+      matchStart: liveMatch.toISOString(),
+      roomId: "",
+      roomPassword: ""
+    },
+
+    {
+      id: crypto.randomUUID(),
+      title: "Shadow Legends #02",
+      capacity: 10,
+      registrationStart: upcomingStart.toISOString(),
+      matchStart: upcomingMatch.toISOString(),
+      roomId: "",
+      roomPassword: ""
+    }
+
+  ];
+
+  saveCustoms(customs);
+}
+
+
+// --------------------------------------------------
+// STATUS
+// --------------------------------------------------
+
+function getCustomStatus(custom) {
+
+  const now = new Date();
+  const registrationStart = new Date(custom.registrationStart);
+  const matchStart = new Date(custom.matchStart);
+
+  if (now >= matchStart) {
+    return "live";
+  }
+
+  if (now >= registrationStart) {
+    return "registering";
+  }
+
+  return "upcoming";
+}
+
+
+// --------------------------------------------------
+// FORMAT DATE
+// --------------------------------------------------
+
+function formatDate(date) {
+
+  return new Date(date).toLocaleString(
+    undefined,
+    {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }
+  );
+}
+
+
+// --------------------------------------------------
+// RENDER MAIN SITE
+// --------------------------------------------------
+
+function renderSite() {
+
+  const customs = getCustoms();
+  const registrations = getRegistrations();
+
+  liveCustoms.innerHTML = "";
+  upcomingCustoms.innerHTML = "";
+
+  customs.forEach(custom => {
+
+    const players = registrations.filter(
+      r => r.customId === custom.id
     );
+
+    const status = getCustomStatus(custom);
+
+    if (status === "live" || status === "registering") {
+
+      liveCustoms.insertAdjacentHTML(
+        "beforeend",
+        createCustomCard(custom, players.length, status)
+      );
+
+    } else {
+
+      upcomingCustoms.insertAdjacentHTML(
+        "beforeend",
+        createCustomCard(custom, players.length, status)
+      );
+
+    }
+
+  });
+
+  if (!liveCustoms.children.length) {
+    liveCustoms.innerHTML = emptyCard("No live customs right now.");
+  }
+
+  if (!upcomingCustoms.children.length) {
+    upcomingCustoms.innerHTML = emptyCard("No upcoming customs.");
+  }
+}
+
+
+function emptyCard(text) {
+
+  return `
+    <div class="custom-card">
+      <div class="muted">${text}</div>
+    </div>
+  `;
+}
+
+
+// --------------------------------------------------
+// CUSTOM CARD
+// --------------------------------------------------
+
+function createCustomCard(custom, playerCount, status) {
+
+  const full = playerCount >= custom.capacity;
+
+  const canRegister =
+    status === "live" &&
+    !full;
+
+  let button = "";
+
+  if (canRegister) {
+
+    button = `
+      <button
+        class="primary-btn"
+        onclick="openRegister('${custom.id}')"
+      >
+        REGISTER
+      </button>
+    `;
+
+  } else if (full) {
+
+    button = `
+      <button class="primary-btn" disabled>
+        CAPACITY FULL
+      </button>
+    `;
+
+  } else {
+
+    button = `
+      <button class="primary-btn" disabled>
+        REGISTRATION CLOSED
+      </button>
+    `;
+
+  }
+
+
+  return `
+    <article class="custom-card">
+
+      <div class="custom-top">
+
+        <div class="custom-title">
+          ${escapeHtml(custom.title)}
+        </div>
+
+        <div class="custom-status">
+          ${status === "live" ? "LIVE" : "UPCOMING"}
+        </div>
+
+      </div>
+
+      <div class="capacity">
+
+        <div class="capacity-text">
+          <span>PLAYERS</span>
+          <span>${playerCount} / ${custom.capacity}</span>
+        </div>
+
+        <div class="capacity-bar">
+          <div
+            class="capacity-fill"
+            style="width:${Math.min(
+              100,
+              playerCount / custom.capacity * 100
+            )}%"
+          ></div>
+        </div>
+
+      </div>
+
+      <div class="card-actions">
+
+        ${button}
+
+        <!-- ONLY ONE DETAILS BUTTON -->
+        <button
+          class="secondary-btn"
+          onclick="openDetails('${custom.id}')"
+        >
+          DETAILS
+        </button>
+
+      </div>
+
+    </article>
+  `;
+}
+
+
+// --------------------------------------------------
+// REGISTER
+// --------------------------------------------------
+
+window.openRegister = function(customId) {
+
+  const custom = getCustoms().find(
+    c => c.id === customId
+  );
+
+  if (!custom) return;
+
+  const registrations = getRegistrations();
+
+  const count = registrations.filter(
+    r => r.customId === customId
+  ).length;
+
+  if (count >= custom.capacity) {
+    alert("This custom is full.");
+    return;
+  }
+
+  document.getElementById(
+    "registrationCustomId"
+  ).value = customId;
+
+  document.getElementById(
+    "registerCustomTitle"
+  ).textContent = custom.title;
+
+  registrationForm.reset();
+
+  starsContainer.classList.add("hidden");
+
+  openModal(registerModal);
+};
+
+
+// --------------------------------------------------
+// RANK / STARS
+// --------------------------------------------------
+
+rankSelect.addEventListener("change", () => {
+
+  const ranksWithStars = [
+    "Mythic",
+    "Mythical Honor",
+    "Mythical Glory",
+    "Mythical Immortal"
+  ];
+
+  starsContainer.classList.toggle(
+    "hidden",
+    !ranksWithStars.includes(rankSelect.value)
+  );
 
 });
 
 
-/* =========================================================
-   RANK / STARS
-========================================================= */
-
-rankInput.addEventListener(
-    "change",
-    updateStarsVisibility
-);
-
-
-function updateStarsVisibility() {
-
-    const ranksWithStars = [
-
-        "Mythic",
-        "Mythical Honor",
-        "Mythical Glory",
-        "Mythical Immortal"
-
-    ];
-
-
-    if (
-        ranksWithStars.includes(
-            rankInput.value
-        )
-    ) {
-
-        starsGroup.classList.add("visible");
-
-        starsInput.required = true;
-
-    }
-
-    else {
-
-        starsGroup.classList.remove("visible");
-
-        starsInput.required = false;
-
-        starsInput.value = "";
-
-    }
-
-}
-
-
-/* =========================================================
-   GAME ID
-========================================================= */
-
-gameIdInput.addEventListener(
-    "input",
-    () => {
-
-        gameIdInput.value =
-            gameIdInput.value
-                .replace(/\D/g, "")
-                .slice(0, 10);
-
-    }
-);
-
-
-/* =========================================================
-   FORM SUBMIT
-========================================================= */
+// --------------------------------------------------
+// REGISTRATION SUBMIT
+// --------------------------------------------------
 
 registrationForm.addEventListener(
-    "submit",
-    event => {
-
-        event.preventDefault();
-
-        formError.textContent = "";
-
-
-        const customId =
-            customIdInput.value;
-
-        const custom =
-            customs.find(
-                item => item.id === customId
-            );
-
-
-        if (!custom) {
-
-            formError.textContent =
-                "Custom not found.";
-
-            return;
-
-        }
-
-
-        /*
-           Check registration time
-        */
-
-        if (!hasRegistrationStarted(custom)) {
-
-            formError.textContent =
-                "Registration has not opened yet.";
-
-            return;
-
-        }
-
-
-        /*
-           Capacity
-        */
-
-        if (isFull(custom)) {
-
-            formError.textContent =
-                "This custom is full.";
-
-            return;
-
-        }
-
-
-        /*
-           Telegram
-        */
-
-        const telegram =
-            telegramInput.value.trim();
-
-
-        if (!/^@[A-Za-z0-9_]{3,32}$/.test(telegram)) {
-
-            formError.textContent =
-                "Enter a valid Telegram ID starting with @.";
-
-            return;
-
-        }
-
-
-        /*
-           Game ID
-        */
-
-        const gameId =
-            gameIdInput.value.trim();
-
-
-        if (!/^\d{10}$/.test(gameId)) {
-
-            formError.textContent =
-                "Game ID must contain exactly 10 digits.";
-
-            return;
-
-        }
-
-
-        /*
-           Role
-        */
-
-        if (!roleInput.value) {
-
-            formError.textContent =
-                "Please select a role.";
-
-            return;
-
-        }
-
-
-        /*
-           Rank
-        */
-
-        if (!rankInput.value) {
-
-            formError.textContent =
-                "Please select your highest rank.";
-
-            return;
-
-        }
-
-
-        /*
-           Stars
-        */
-
-        const ranksWithStars = [
-
-            "Mythic",
-            "Mythical Honor",
-            "Mythical Glory",
-            "Mythical Immortal"
-
-        ];
-
-
-        let stars = null;
-
-
-        if (
-            ranksWithStars.includes(
-                rankInput.value
-            )
-        ) {
-
-            stars =
-                Number(starsInput.value);
-
-
-            if (
-                !Number.isInteger(stars) ||
-                stars < 0
-            ) {
-
-                formError.textContent =
-                    "Enter a valid number of stars.";
-
-                return;
-
-            }
-
-        }
-
-
-        /*
-           Duplicate Game ID
-        */
-
-        const duplicateGameId =
-            registrations.some(
-                registration =>
-                    registration.customId === customId &&
-                    registration.gameId === gameId
-            );
-
-
-        if (duplicateGameId) {
-
-            formError.textContent =
-                "This Game ID is already registered.";
-
-            return;
-
-        }
-
-
-        /*
-           Duplicate Telegram
-        */
-
-        const duplicateTelegram =
-            registrations.some(
-                registration =>
-                    registration.customId === customId &&
-                    registration.telegram.toLowerCase()
-                    === telegram.toLowerCase()
-            );
-
-
-        if (duplicateTelegram) {
-
-            formError.textContent =
-                "This Telegram ID is already registered.";
-
-            return;
-
-        }
-
-
-        /*
-           Save registration
-        */
-
-        const registration = {
-
-            id:
-                "reg-" +
-                Date.now(),
-
-            customId,
-
-            telegram,
-
-            gameId,
-
-            role: roleInput.value,
-
-            rank: rankInput.value,
-
-            stars,
-
-            createdAt:
-                new Date().toISOString()
-
-        };
-
-
-        registrations.push(registration);
-
-        saveRegistrations(registrations);
-
-
-        /*
-           Close registration modal
-        */
-
-        closeModal(registerModal);
-
-
-        /*
-           Success
-        */
-
-        successText.textContent =
-            `${custom.title} · Game ID ${gameId}`;
-
-        successModal.classList.add("active");
-
-
-        render();
-
+  "submit",
+  event => {
+
+    event.preventDefault();
+
+    const customId =
+      document.getElementById(
+        "registrationCustomId"
+      ).value;
+
+    const telegram =
+      document.getElementById(
+        "telegramId"
+      ).value.trim();
+
+    const gameId =
+      document.getElementById(
+        "gameId"
+      ).value.trim();
+
+    const role =
+      document.getElementById(
+        "role"
+      ).value;
+
+    const rank =
+      document.getElementById(
+        "rank"
+      ).value;
+
+    const stars =
+      document.getElementById(
+        "stars"
+      ).value;
+
+
+    if (!/^@[A-Za-z0-9_]{3,32}$/.test(telegram)) {
+      alert("Telegram ID must start with @.");
+      return;
     }
-);
+
+    if (!/^\d{10}$/.test(gameId)) {
+      alert("Game ID must contain exactly 10 digits.");
+      return;
+    }
 
 
-/* =========================================================
-   CANCEL REGISTRATION
-========================================================= */
+    const registrations = getRegistrations();
 
-document
-    .getElementById("cancelRegistration")
-    .addEventListener(
-        "click",
-        () => {
+    const duplicateGameId =
+      registrations.some(
+        r =>
+          r.customId === customId &&
+          r.gameId === gameId
+      );
 
-            const customId =
-                customIdInput.value;
-
-            /*
-               In this demo we use the most
-               recently registered player.
-            */
-
-            const registration =
-                registrations
-                    .filter(
-                        item =>
-                            item.customId === customId
-                    )
-                    .at(-1);
+    const duplicateTelegram =
+      registrations.some(
+        r =>
+          r.customId === customId &&
+          r.telegram === telegram
+      );
 
 
-            if (!registration) {
+    if (duplicateGameId) {
+      alert("This Game ID is already registered.");
+      return;
+    }
 
-                closeModal(successModal);
-
-                return;
-
-            }
-
-
-            const confirmed =
-                confirm(
-                    "Cancel your registration?"
-                );
+    if (duplicateTelegram) {
+      alert("This Telegram ID is already registered.");
+      return;
+    }
 
 
-            if (!confirmed) {
-                return;
-            }
-
-
-            registrations =
-                registrations.filter(
-                    item =>
-                        item.id !== registration.id
-                );
-
-
-            saveRegistrations(registrations);
-
-
-            closeModal(successModal);
-
-            render();
-
-            alert(
-                "Registration cancelled."
-            );
-
-        }
+    const custom = getCustoms().find(
+      c => c.id === customId
     );
 
+    const playerCount =
+      registrations.filter(
+        r => r.customId === customId
+      ).length;
 
-/* =========================================================
-   DETAILS
-========================================================= */
-
-function openDetails(custom) {
-
-    const count =
-        getPlayerCount(custom.id);
-
-
-    detailsTitle.textContent =
-        custom.title;
-
-
-    detailsStatus.textContent =
-        custom.type === "live"
-            ? "LIVE"
-            : "UPCOMING";
-
-
-    detailsPlayers.textContent =
-        `${count} / ${custom.playerLimit}`;
-
-
-    detailsStart.textContent =
-        formatDateTime(custom.startTime);
-
-
-    if (hasRegistrationStarted(custom)) {
-
-        detailsRegistration.textContent =
-            "OPEN";
-
-    }
-
-    else {
-
-        detailsRegistration.textContent =
-            formatDateTime(
-                custom.registrationStart
-            );
-
+    if (!custom || playerCount >= custom.capacity) {
+      alert("Capacity is full.");
+      return;
     }
 
 
-    detailsModal.classList.add("active");
+    registrations.push({
 
-}
+      id: crypto.randomUUID(),
+
+      customId,
+
+      telegram,
+
+      gameId,
+
+      role,
+
+      rank,
+
+      stars:
+        stars ? Number(stars) : null,
+
+      createdAt:
+        new Date().toISOString()
+
+    });
 
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
+    saveRegistrations(registrations);
 
-function escapeHTML(value) {
+    closeModal(registerModal);
 
-    const div =
-        document.createElement("div");
+    document.getElementById(
+      "successText"
+    ).textContent =
+      `Your registration for ${custom.title} has been completed successfully.`;
 
-    div.textContent = value;
+    openModal(successModal);
 
-    return div.innerHTML;
+    renderSite();
+    renderAdmin();
 
-}
-
-
-/* =========================================================
-   AUTOMATIC STATUS UPDATE
-========================================================= */
-
-/*
-   Re-render every 5 seconds.
-
-   This means if an Upcoming custom reaches
-   its registrationStart time, the REGISTER
-   button appears automatically.
-*/
-
-setInterval(
-    render,
-    5000
+  }
 );
 
 
-/* =========================================================
-   INITIAL RENDER
-========================================================= */
+// --------------------------------------------------
+// DETAILS
+// --------------------------------------------------
 
-render();
+window.openDetails = function(customId) {
+
+  const custom = getCustoms().find(
+    c => c.id === customId
+  );
+
+  if (!custom) return;
+
+  const registrations =
+    getRegistrations().filter(
+      r => r.customId === customId
+    );
+
+  const status =
+    getCustomStatus(custom);
+
+
+  document.getElementById(
+    "detailsTitle"
+  ).textContent = custom.title;
+
+  document.getElementById(
+    "detailsStatus"
+  ).textContent =
+    status.toUpperCase();
+
+  document.getElementById(
+    "detailsPlayers"
+  ).textContent =
+    `${registrations.length} / ${custom.capacity}`;
+
+  document.getElementById(
+    "detailsRegistration"
+  ).textContent =
+    formatDate(custom.registrationStart);
+
+  document.getElementById(
+    "detailsMatch"
+  ).textContent =
+    formatDate(custom.matchStart);
+
+
+  openModal(detailsModal);
+};
+
+
+// --------------------------------------------------
+// MODALS
+// --------------------------------------------------
+
+function openModal(modal) {
+  modal.classList.add("active");
+}
+
+function closeModal(modal) {
+  modal.classList.remove("active");
+}
+
+document.querySelectorAll("[data-close]").forEach(
+  button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const id =
+          button.dataset.close;
+
+        closeModal(
+          document.getElementById(id)
+        );
+
+      }
+    );
+
+  }
+);
+
+
+document.querySelectorAll(".modal-overlay").forEach(
+  overlay => {
+
+    overlay.addEventListener(
+      "click",
+      event => {
+
+        if (event.target === overlay) {
+          closeModal(overlay);
+        }
+
+      }
+    );
+
+  }
+);
+
+
+// --------------------------------------------------
+// ADMIN LOGIN
+// --------------------------------------------------
+
+document.getElementById(
+  "adminOpenBtn"
+).addEventListener(
+  "click",
+  () => {
+
+    /*
+      Production:
+      Replace this login with Supabase Auth.
+
+      No password is stored here.
+    */
+
+    openModal(adminLoginModal);
+
+  }
+);
+
+
+adminLoginForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById(
+        "adminEmail"
+      ).value.trim();
+
+    const password =
+      document.getElementById(
+        "adminPassword"
+      ).value;
+
+
+    /*
+      TEMPORARY DEMO LOGIN
+
+      This intentionally does NOT contain
+      a password.
+
+      Connect Supabase Auth here before
+      deploying the admin system publicly.
+    */
+
+    document.getElementById(
+      "adminLoginError"
+    ).textContent =
+      "Supabase Auth is required for secure admin login.";
+
+  }
+);
+
+
+// --------------------------------------------------
+// ADMIN PANEL
+// --------------------------------------------------
+
+function renderAdmin() {
+
+  const customs = getCustoms();
+  const registrations = getRegistrations();
+
+  const liveCount =
+    customs.filter(
+      c => {
+        const status = getCustomStatus(c);
+        return status === "live" ||
+               status === "registering";
+      }
+    ).length;
+
+  const upcomingCount =
+    customs.filter(
+      c => getCustomStatus(c) === "upcoming"
+    ).length;
+
+
+  document.getElementById(
+    "adminLiveCount"
+  ).textContent = liveCount;
+
+  document.getElementById(
+    "adminUpcomingCount"
+  ).textContent = upcomingCount;
+
+  document.getElementById(
+    "adminCustomCount"
+  ).textContent = customs.length;
+
+  document.getElementById(
+    "adminPlayerCount"
+  ).textContent = registrations.length;
+
+
+  renderAdminCustoms();
+  renderAdminPlayers();
+}
+
+
+// --------------------------------------------------
+// CREATE / EDIT CUSTOM
+// --------------------------------------------------
+
+customForm.addEventListener(
+  "submit",
+  event => {
+
+    event.preventDefault();
+
+    const id =
+      document.getElementById(
+        "customId"
+      ).value;
+
+    const custom = {
+
+      id:
+        id || crypto.randomUUID(),
+
+      title:
+        document.getElementById(
+          "customTitle"
+        ).value.trim(),
+
+      capacity:
+        Number(
+          document.getElementById(
+            "customCapacity"
+          ).value
+        ),
+
+      registrationStart:
+        new Date(
+          document.getElementById(
+            "registrationStart"
+          ).value
+        ).toISOString(),
+
+      matchStart:
+        new Date(
+          document.getElementById(
+            "matchStart"
+          ).value
+        ).toISOString(),
+
+      roomId:
+        document.getElementById(
+          "roomId"
+        ).value.trim(),
+
+      roomPassword:
+        document.getElementById(
+          "roomPassword"
+        ).value.trim()
+
+    };
+
+
+    let customs = getCustoms();
+
+    if (id) {
+
+      customs =
+        customs.map(
+          c => c.id === id
+            ? custom
+            : c
+        );
+
+    } else {
+
+      customs.push(custom);
+
+    }
+
+
+    saveCustoms(customs);
+
+    resetCustomEditor();
+
+    renderSite();
+    renderAdmin();
+
+  }
+);
+
+
+// --------------------------------------------------
+// ADMIN CUSTOM LIST
+// --------------------------------------------------
+
+function renderAdminCustoms() {
+
+  const container =
+    document.getElementById(
+      "adminCustomList"
+    );
+
+  const customs = getCustoms();
+
+  if (!customs.length) {
+
+    container.innerHTML =
+      `<p class="muted">No customs created.</p>`;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    customs.map(
+      custom => {
+
+        const players =
+          getRegistrations().filter(
+            r => r.customId === custom.id
+          ).length;
+
+        return `
+
+          <div class="admin-row">
+
+            <div>
+              <div class="admin-row-title">
+                ${escapeHtml(custom.title)}
+              </div>
+
+              <div class="admin-row-meta">
+                Match: ${formatDate(custom.matchStart)}
+              </div>
+            </div>
+
+            <div class="muted">
+              ${players} / ${custom.capacity}
+            </div>
+
+            <div class="muted">
+              ${getCustomStatus(custom).toUpperCase()}
+            </div>
+
+            <div class="admin-actions">
+
+              <button
+                class="small-btn"
+                onclick="editCustom('${custom.id}')"
+              >
+                EDIT
+              </button>
+
+              <button
+                class="small-btn delete-btn"
+                onclick="deleteCustom('${custom.id}')"
+              >
+                DELETE
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+// --------------------------------------------------
+// EDIT
+// --------------------------------------------------
+
+window.editCustom = function(id) {
+
+  const custom =
+    getCustoms().find(
+      c => c.id === id
+    );
+
+  if (!custom) return;
+
+
+  document.getElementById(
+    "customId"
+  ).value = custom.id;
+
+  document.getElementById(
+    "customTitle"
+  ).value = custom.title;
+
+  document.getElementById(
+    "customCapacity"
+  ).value = custom.capacity;
+
+  document.getElementById(
+    "registrationStart"
+  ).value =
+    toLocalInput(custom.registrationStart);
+
+  document.getElementById(
+    "matchStart"
+  ).value =
+    toLocalInput(custom.matchStart);
+
+  document.getElementById(
+    "roomId"
+  ).value = custom.roomId || "";
+
+  document.getElementById(
+    "roomPassword"
+  ).value =
+    custom.roomPassword || "";
+
+
+  document.getElementById(
+    "editorTitle"
+  ).textContent = "Edit Custom";
+
+  document.querySelector(
+    ".admin-submit"
+  ).textContent = "SAVE CHANGES";
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).classList.remove("hidden");
+
+};
+
+
+// --------------------------------------------------
+// DELETE
+// --------------------------------------------------
+
+window.deleteCustom = function(id) {
+
+  const custom =
+    getCustoms().find(
+      c => c.id === id
+    );
+
+  if (!custom) return;
+
+
+  const confirmed =
+    confirm(
+      `Delete "${custom.title}"?`
+    );
+
+  if (!confirmed) return;
+
+
+  saveCustoms(
+    getCustoms().filter(
+      c => c.id !== id
+    )
+  );
+
+  saveRegistrations(
+    getRegistrations().filter(
+      r => r.customId !== id
+    )
+  );
+
+
+  renderSite();
+  renderAdmin();
+
+};
+
+
+// --------------------------------------------------
+// RESET EDITOR
+// --------------------------------------------------
+
+document.getElementById(
+  "cancelEditBtn"
+).addEventListener(
+  "click",
+  resetCustomEditor
+);
+
+
+function resetCustomEditor() {
+
+  customForm.reset();
+
+  document.getElementById(
+    "customId"
+  ).value = "";
+
+  document.getElementById(
+    "editorTitle"
+  ).textContent =
+    "Create Custom";
+
+  document.querySelector(
+    ".admin-submit"
+  ).textContent =
+    "CREATE CUSTOM";
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).classList.add("hidden");
+
+}
+
+
+// --------------------------------------------------
+// ADMIN PLAYERS
+// --------------------------------------------------
+
+function renderAdminPlayers() {
+
+  const container =
+    document.getElementById(
+      "adminPlayerList"
+    );
+
+  const registrations =
+    getRegistrations();
+
+  const customs =
+    getCustoms();
+
+
+  if (!registrations.length) {
+
+    container.innerHTML =
+      `<p class="muted">No players registered.</p>`;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    registrations.map(
+      player => {
+
+        const custom =
+          customs.find(
+            c => c.id === player.customId
+          );
+
+        return `
+
+          <div class="player-row">
+
+            <div>
+              <strong>
+                ${escapeHtml(player.telegram)}
+              </strong>
+              <div class="muted">
+                ${escapeHtml(player.gameId)}
+              </div>
+            </div>
+
+            <div>
+              ${escapeHtml(player.role)}
+            </div>
+
+            <div>
+              ${escapeHtml(player.rank)}
+            </div>
+
+            <div>
+              ${player.stars ?? "-"}
+            </div>
+
+            <div>
+              <button
+                class="small-btn delete-btn"
+                onclick="deletePlayer('${player.id}')"
+              >
+                REMOVE
+              </button>
+            </div>
+
+          </div>
+
+          <div class="muted" style="padding-bottom:10px;">
+            ${custom ? escapeHtml(custom.title) : "Deleted Custom"}
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+// --------------------------------------------------
+// DELETE PLAYER
+// --------------------------------------------------
+
+window.deletePlayer = function(id) {
+
+  if (!confirm("Remove this player?")) {
+    return;
+  }
+
+  saveRegistrations(
+    getRegistrations().filter(
+      r => r.id !== id
+    )
+  );
+
+  renderSite();
+  renderAdmin();
+
+};
+
+
+// --------------------------------------------------
+// LOGOUT
+// --------------------------------------------------
+
+document.getElementById(
+  "logoutBtn"
+).addEventListener(
+  "click",
+  () => {
+
+    adminScreen.classList.remove("active");
+
+  }
+);
+
+
+// --------------------------------------------------
+// HELPERS
+// --------------------------------------------------
+
+function toLocalInput(iso) {
+
+  const date = new Date(iso);
+
+  const offset =
+    date.getTimezoneOffset();
+
+  const local =
+    new Date(
+      date.getTime() - offset * 60000
+    );
+
+  return local
+    .toISOString()
+    .slice(0, 16);
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+// --------------------------------------------------
+// START
+// --------------------------------------------------
+
+createDemoData();
+
+renderSite();
+renderAdmin();
+
+
+// Update automatically
+setInterval(
+  () => {
+    renderSite();
+    renderAdmin();
+  },
+  5000
+);
